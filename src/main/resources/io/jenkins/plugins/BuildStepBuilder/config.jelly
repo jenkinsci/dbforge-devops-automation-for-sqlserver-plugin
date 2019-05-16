@@ -1,0 +1,78 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:section title="${%SourceControlSection}">
+    <j:if test="${instance == null}">
+      <f:radioBlock name="sourceFolderMode" title="${%sourceFolderVcs}" value="vcsroot" checked="${true}" inline="true"/>
+    </j:if>
+    <j:if test="${instance != null}">
+      <f:radioBlock name="sourceFolderMode" title="${%sourceFolderVcs}" value="vcsroot"
+                    checked="${instance.sourceFolderModeEquals('vcsroot')}" inline="true" />
+    </j:if>
+
+    <f:radioBlock name="sourceFolderMode" title="${%sourceFolderSubfolder}" value="subfolder"
+                  checked="${instance.sourceFolderModeEquals('subfolder')}" inline="true" >
+      <f:nested>
+        <f:entry title="${%Subfolder}" field="subfolder">
+          <f:textbox />
+        </f:entry>
+        <f:block>${%SubfolderUsageDescr}</f:block>
+      </f:nested>
+    </f:radioBlock>
+  </f:section>
+  <f:section title="${%OutputPackageSection}">
+    <f:entry title="${%PackageId}" field="packageId" help="/plugin/dbforge-devops-automation-for-sqlserver/help-packageId.html">
+      <f:textbox />
+    </f:entry>
+  </f:section>
+  <f:section title="${%DatabaseServerSection}">
+      <f:block>${%DatabaseServerSectionDescr}</f:block>
+
+      <j:if test="${instance == null}">
+        <f:radioBlock name="serverType" title="${%LocalDb}" value="localDb" checked="${true}" inline="true" />
+      </j:if>
+
+      <j:if test="${instance != null}">
+        <f:radioBlock name="serverType" title="${%LocalDb}" value="localDb" checked="${instance.serverTypeEquals('localDb')}" inline="true" />
+      </j:if>
+
+      <f:radioBlock name="serverType" title="${%SqlServer}" value="server" checked="${instance.serverTypeEquals('server')}" inline="true" >
+        <f:nested>
+          <f:entry title="${%Server}" field="server">
+            <f:textbox />
+          </f:entry>
+          <f:entry title="${%Database}" field="database">
+            <f:textbox />
+          </f:entry>
+          <f:entry>
+
+            <j:if test="${instance == null}">
+              <f:radioBlock name="authenticationType" title="${%WindowsAuthentication}" value="windowsAuthentication" checked="${true}" inline="true"/>
+            </j:if>
+            <j:if test="${instance != null}">
+              <f:radioBlock name="authenticationType" title="${%WindowsAuthentication}" value="windowsAuthentication"
+                            checked="${instance.authenticationTypeEquals('windowsAuthentication')}" inline="true" />
+            </j:if>
+
+            <f:radioBlock name="authenticationType" title="${%ServerAuthentication}" value="serverAuthentication"
+                          checked="${instance.authenticationTypeEquals('serverAuthentication')}" inline="true" >
+              <f:nested>
+                <f:entry title="${%UserName}" field="userName">
+                  <f:textbox />
+                </f:entry>
+                <f:entry title="${%Password}" field="password">
+                  <f:textbox />
+                </f:entry>
+              </f:nested>
+            </f:radioBlock>
+          </f:entry>
+        </f:nested>
+      </f:radioBlock>
+  </f:section>
+  <f:advanced>
+    <f:section title="${%AdvancedSection}">
+      <f:entry title="${%CompareOptions}" field="compareOptions">
+        <f:textbox />
+      </f:entry>
+    </f:section>
+  </f:advanced>
+</j:jelly>

@@ -1,0 +1,19 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <f:section title="${%PackagePublishSection}">
+    <f:entry title="${%PackageId}" field="packageId" help="/plugin/dbforge-devops-automation-for-sqlserver/help-packageId.html">
+      <f:textbox />
+    </f:entry>
+  </f:section>
+  <f:section title="${%NugetFeedSection}">
+    <f:entry title="${%NugetFeedUrl}" field="nugetFeedUrl">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%NugetFeedUrlApi}" field="nugetFeedUrlApi">
+      <f:textbox />
+    </f:entry>
+    <f:entry title="${%PackageVersion}" field="packageVersion" help="/plugin/dbforge-devops-automation-for-sqlserver/help-packageVersion.html">
+      <f:textbox />
+    </f:entry>
+  </f:section>
+</j:jelly>
