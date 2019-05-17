@@ -2,12 +2,18 @@ package io.jenkins.plugins;
 
 import io.jenkins.plugins.Models.*;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import hudson.util.Secret;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 public class ModelsTest {
+
+  @Rule
+  public JenkinsRule jenkins = new JenkinsRule();
 
   private final String packageId = "id", sourceControlFolder = "sourceControlFolder", compareOptions = "compareOptions",
     server = "srv", database = "db", userName = "su", password = "su",
@@ -18,7 +24,6 @@ public class ModelsTest {
 
     PackageProject packageProject = new PackageProject(packageId);
     packageProject.setSourceFolder(sourceControlFolder);
-    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, password);
 
     assertEquals(packageProject.getId(), packageId);
     assertEquals(packageProject.getSourceFolder(), sourceControlFolder);
@@ -39,19 +44,19 @@ public class ModelsTest {
   @Test
   public void testConnectionInfo() {
 
-    ConnectionInfo connectionInfo = new ConnectionInfo(false, server, database, true, userName, password);
+    ConnectionInfo connectionInfo = new ConnectionInfo(false, server, database, true, userName, Secret.fromString(password));
     assertEquals(connectionInfo.getIsLocalDb(), false);
     assertEquals(connectionInfo.getServer(), server);
     assertEquals(connectionInfo.getDatabase(), database);
     assertEquals(connectionInfo.getIsWindowsAuthentication(), true);
     assertEquals(connectionInfo.getUserName(), userName);
-    assertEquals(connectionInfo.getPassword(), password);
+    assertEquals(connectionInfo.getPassword(), Secret.fromString(password));
   }
 
   @Test
   public void testConnectionInfoLocalDb() {
 
-    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, true, userName, password);
+    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, true, userName, Secret.fromString(password));
     assertEquals(connectionInfo.getIsLocalDb(), true);
     assertEquals(connectionInfo.getServer(), String.format("(LocalDb)\\%s", ConnectionInfo.LocalDbInstance));
     assertThat(connectionInfo.getDatabase(), containsString("dbForgeDevopsTempDb"));

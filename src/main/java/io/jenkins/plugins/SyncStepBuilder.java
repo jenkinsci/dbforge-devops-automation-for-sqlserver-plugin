@@ -6,10 +6,10 @@ import hudson.Launcher;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import hudson.util.Secret;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -20,7 +20,7 @@ public class SyncStepBuilder extends BaseStepBuilder {
   private SyncDatabaseInfo syncDatabaseInfo;
 
   @DataBoundConstructor
-  public SyncStepBuilder(String packageId, String server, String database, String authenticationType, String userName, String password) {
+  public SyncStepBuilder(String packageId, String server, String database, String authenticationType, String userName, Secret password) {
 
     super(packageId, "server", server, authenticationType, userName, password, database);
     this.stepId = StepIds.Sync;
@@ -61,7 +61,6 @@ public class SyncStepBuilder extends BaseStepBuilder {
     return command;
   }
 
-  @Symbol("greet")
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 

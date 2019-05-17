@@ -1,6 +1,7 @@
 package io.jenkins.plugins;
 
 import hudson.model.FreeStyleProject;
+import hudson.util.Secret;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -21,10 +22,10 @@ public class SyncStepBuilderTest {
   public void testConfigRoundtrip() throws Exception {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
-    project.getBuildersList().add(new SyncStepBuilder(packageId, server, database, authenticationType, userName, password));
+    project.getBuildersList().add(new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password)));
     project = jenkins.configRoundtrip(project);
 
-    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, password);
+    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password));
     syncBuildStep.setCompareOptions("");
     syncBuildStep.setTransactionIsoLvl(transactionIsoLvl); // default value is Serializable
     jenkins.assertEqualDataBoundBeans(syncBuildStep, project.getBuildersList().get(0));
@@ -34,13 +35,13 @@ public class SyncStepBuilderTest {
   public void testConfigRoundtripAdvanced() throws Exception {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
-    SyncStepBuilder builder = new SyncStepBuilder(packageId, server, database, authenticationType, userName, password);
+    SyncStepBuilder builder = new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password));
     builder.setCompareOptions(compareOptions);
     builder.setTransactionIsoLvl(transactionIsoLvl);
     project.getBuildersList().add(builder);
     project = jenkins.configRoundtrip(project);
 
-    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, password);
+    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password));
     syncBuildStep.setCompareOptions(compareOptions);
     syncBuildStep.setTransactionIsoLvl(transactionIsoLvl);
     jenkins.assertEqualDataBoundBeans(syncBuildStep, project.getBuildersList().get(0));
@@ -49,7 +50,7 @@ public class SyncStepBuilderTest {
   @Test
   public void testProperties() {
 
-    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, password);
+    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password));
     syncBuildStep.setCompareOptions(compareOptions);
     syncBuildStep.setTransactionIsoLvl(transactionIsoLvl);
 
@@ -58,7 +59,7 @@ public class SyncStepBuilderTest {
     assertEquals(syncBuildStep.getServer(), server);
     assertEquals(syncBuildStep.getAuthenticationType(), authenticationType);
     assertEquals(syncBuildStep.getUserName(), userName);
-    assertEquals(syncBuildStep.getPassword(), password);
+    assertEquals(syncBuildStep.getPassword(), Secret.fromString(password));
     assertEquals(syncBuildStep.getDatabase(), database);
     assertEquals(syncBuildStep.getTransactionIsoLvl(), transactionIsoLvl);
     assertEquals(syncBuildStep.getCompareOptions(), compareOptions);
@@ -67,7 +68,7 @@ public class SyncStepBuilderTest {
   @Test
   public void testAuthenticationTypeEquals() {
 
-    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, password);
+    SyncStepBuilder syncBuildStep = new SyncStepBuilder(packageId, server, database, authenticationType, userName, Secret.fromString(password));
 
     assertEquals(syncBuildStep.authenticationTypeEquals("windowsAuthentication"), "false");
     assertEquals(syncBuildStep.authenticationTypeEquals("serverAuthentication"), "true");

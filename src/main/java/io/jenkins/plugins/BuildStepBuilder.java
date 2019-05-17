@@ -5,6 +5,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import io.jenkins.plugins.Models.*;
@@ -16,8 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import hudson.model.TaskListener;
 
-import org.jenkinsci.Symbol;
-
 public class BuildStepBuilder extends BaseStepBuilder {
 
   private final String sourceFolderMode, subfolder;
@@ -25,7 +24,7 @@ public class BuildStepBuilder extends BaseStepBuilder {
 
   @DataBoundConstructor
   public BuildStepBuilder(String sourceFolderMode, String subfolder, String packageId,
-                          String serverType, String server, String authenticationType, String userName, String password, String database) {
+                          String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
     super(packageId, serverType, server, authenticationType, userName, password, database);
     this.sourceFolderMode = sourceFolderMode;
@@ -103,7 +102,6 @@ public class BuildStepBuilder extends BaseStepBuilder {
     return null;
   }
 
-  @Symbol("greet")
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 

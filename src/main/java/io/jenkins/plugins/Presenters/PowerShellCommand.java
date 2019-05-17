@@ -1,6 +1,7 @@
 package io.jenkins.plugins.Presenters;
 
 import hudson.FilePath;
+import hudson.util.Secret;
 import io.jenkins.plugins.Models.ConnectionInfo;
 import io.jenkins.plugins.Models.PackageProject;
 import io.jenkins.plugins.Models.RunTestInfo;
@@ -19,7 +20,7 @@ public class PowerShellCommand {
       sb.append(" -WindowsAuthentication");
     else {
       sb.append(String.format(" -UserName %s", connection.getUserName()));
-      if (!connection.getPassword().isEmpty())
+      if (!Secret.toString(connection.getPassword()).isEmpty())
         sb.append(String.format(" -Password %s", connection.getPassword()));
     }
     addScriptSeparator();

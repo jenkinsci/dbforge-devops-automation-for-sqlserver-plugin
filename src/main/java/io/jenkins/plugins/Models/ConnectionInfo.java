@@ -1,12 +1,15 @@
 package io.jenkins.plugins.Models;
 
+import hudson.util.Secret;
+
 public class ConnectionInfo {
 
   public static String LocalDbInstance = "DbForgeDevopsLocalDb";
-  private final String connectionName = "devartConnection", server, database, userName, password;
+  private final String connectionName = "devartConnection", server, database, userName;
+  private final Secret password;
   private final boolean isLocalDb, isWindowsAuthentication;
 
-  public ConnectionInfo(boolean isLocalDb, String server, String database, boolean isWindowsAuthentication, String userName, String password){
+  public ConnectionInfo(boolean isLocalDb, String server, String database, boolean isWindowsAuthentication, String userName, Secret password){
 
     this.isLocalDb = isLocalDb;
     if(isLocalDb){
@@ -55,7 +58,7 @@ public class ConnectionInfo {
     return userName;
   }
 
-  public String getPassword() {
+  public Secret getPassword() {
 
     return password;
   }

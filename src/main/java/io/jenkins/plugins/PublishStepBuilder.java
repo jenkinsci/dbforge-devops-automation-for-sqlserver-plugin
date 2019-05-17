@@ -8,7 +8,6 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.springframework.util.StringUtils;
@@ -71,7 +70,6 @@ public class PublishStepBuilder extends Builder {
     return buildResult;
   }
 
-  @Symbol("greet")
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 

@@ -3,6 +3,7 @@ package io.jenkins.plugins;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
+import hudson.util.Secret;
 import hudson.tasks.Builder;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
@@ -10,13 +11,14 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 public abstract class BaseStepBuilder extends Builder {
 
-  private final String serverType, authenticationType, server, database, userName, password;
+  private final String serverType, authenticationType, server, database, userName;
+  private final Secret password;
   protected final String packageId;
   protected StepIds stepId;
   protected String compareOptions;
   protected ConnectionInfo connection;
 
-  public BaseStepBuilder(String packageId, String serverType, String server, String authenticationType, String userName, String password, String database) {
+  public BaseStepBuilder(String packageId, String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
     this.packageId = packageId;
     this.serverType = serverType;
@@ -57,7 +59,7 @@ public abstract class BaseStepBuilder extends Builder {
     return userName;
   }
 
-  public String getPassword() {
+  public Secret getPassword() {
 
     return password;
   }

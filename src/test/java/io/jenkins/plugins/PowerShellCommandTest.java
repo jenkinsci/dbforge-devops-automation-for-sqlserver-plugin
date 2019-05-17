@@ -1,9 +1,12 @@
 package io.jenkins.plugins;
 
 import hudson.FilePath;
+import hudson.util.Secret;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.PowerShellCommand;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
 
@@ -16,17 +19,20 @@ import static org.junit.Assert.assertTrue;
 
 public class PowerShellCommandTest {
 
+  @Rule
+  public JenkinsRule jenkins = new JenkinsRule();
+
   private final String packageId = "id", packageVersion = "1.0.1", nugetRepository = "repository", nugetApi = "api",
     connectionName = "connectionName", server = "srv", database = "db", userName = "su", password = "su",
-    test = "test1",testResults = "testResults",  dgen = "dgen",
-    sourceControlFolder = "sourceControlFolder", compareOptions = "compareOptions", transactionIsoLvl = "Serializable";
+    test = "test1", testResults = "testResults", dgen = "dgen", sourceControlFolder = "sourceControlFolder",
+    compareOptions = "compareOptions", transactionIsoLvl = "Serializable";
 
   @Test
   public void testAddConnectionScript() {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s
     PowerShellCommand command = new PowerShellCommand();
-    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, password);
+    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, Secret.fromString(password));
     command.AddConnectionScript(connectionInfo);
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"(LocalDb)\\%s\"", ConnectionInfo.LocalDbInstance)));
@@ -38,7 +44,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -WindowsAuthentication true
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, true, userName, password));
+    command.AddConnectionScript(new ConnectionInfo(false, server, database, true, userName, Secret.fromString(password)));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -48,7 +54,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -UserName %s
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, ""));
+    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString("")));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -58,7 +64,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -UserName %s -Password %s
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, password));
+    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString(password)));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -73,7 +79,7 @@ public class PowerShellCommandTest {
     PowerShellCommand command = new PowerShellCommand();
     PackageProject project = new PackageProject(packageId);
     project.setSourceFolder(sourceControlFolder);
-    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, password);
+    ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, Secret.fromString(password));
 
     // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s
     command.AddDatabaseBuildScript(project, connectionInfo.getConnectionName(), "");
@@ -282,7 +288,7 @@ public class PowerShellCommandTest {
     PowerShellCommand command = new PowerShellCommand();
     PackageProject project = new PackageProject(packageId);
     project.setSourceFolder(sourceControlFolder);
-    ConnectionInfo connection = new ConnectionInfo(false, server, database, false, userName, password);
+    ConnectionInfo connection = new ConnectionInfo(false, server, database, false, userName, Secret.fromString(password));
     RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "", "");
     SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo("", "");
 

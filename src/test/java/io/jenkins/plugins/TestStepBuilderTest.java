@@ -3,6 +3,7 @@ package io.jenkins.plugins;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
+import hudson.util.Secret;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -26,11 +27,11 @@ public class TestStepBuilderTest {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
     project.getBuildersList().add(new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests));
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests));
     project = jenkins.configRoundtrip(project);
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setCompareOptions("");
     testBuildStep.setDgenFile("");
     jenkins.assertEqualDataBoundBeans(testBuildStep, project.getBuildersList().get(0));
@@ -41,7 +42,7 @@ public class TestStepBuilderTest {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
     TestStepBuilder builder = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     builder.setGenerateTestData(generateTestData);
     builder.setDgenFile(dgenFile);
     builder.setCompareOptions(compareOptions);
@@ -49,7 +50,7 @@ public class TestStepBuilderTest {
     project = jenkins.configRoundtrip(project);
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(generateTestData);
     testBuildStep.setDgenFile(dgenFile);
     testBuildStep.setCompareOptions(compareOptions);
@@ -60,7 +61,7 @@ public class TestStepBuilderTest {
   public void testProperties() {
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(generateTestData);
     testBuildStep.setDgenFile(dgenFile);
     testBuildStep.setCompareOptions(compareOptions);
@@ -70,7 +71,7 @@ public class TestStepBuilderTest {
     assertEquals(testBuildStep.getServer(), server);
     assertEquals(testBuildStep.getAuthenticationType(), authenticationType);
     assertEquals(testBuildStep.getUserName(), userName);
-    assertEquals(testBuildStep.getPassword(), password);
+    assertEquals(testBuildStep.getPassword(), Secret.fromString(password));
     assertEquals(testBuildStep.getDatabase(), database);
     assertEquals(testBuildStep.getRunTestMode(), runTestMode);
     assertEquals(testBuildStep.getRunTests(), runTests);
@@ -85,7 +86,7 @@ public class TestStepBuilderTest {
     FreeStyleProject project = jenkins.createFreeStyleProject();
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-            authenticationType, userName, password, runTestMode, runTests);
+            authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(true);
     testBuildStep.setDgenFile(dgenFile);
     project.getBuildersList().add(testBuildStep);
@@ -100,7 +101,7 @@ public class TestStepBuilderTest {
     FreeStyleProject project = jenkins.createFreeStyleProject();
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-            authenticationType, userName, password, runTestMode, runTests);
+            authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(false);
     testBuildStep.setDgenFile("D:/D:/");
     project.getBuildersList().add(testBuildStep);
@@ -115,7 +116,7 @@ public class TestStepBuilderTest {
     FreeStyleProject project = jenkins.createFreeStyleProject();
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-            authenticationType, userName, password, runTestMode, runTests);
+            authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(true);
     testBuildStep.setDgenFile("D:/D:/");
     project.getBuildersList().add(testBuildStep);
@@ -130,7 +131,7 @@ public class TestStepBuilderTest {
   public void testServerTypeEquals() {
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
 
     assertEquals(testBuildStep.serverTypeEquals("localDb"), "false");
     assertEquals(testBuildStep.serverTypeEquals("server"), "true");
@@ -140,7 +141,7 @@ public class TestStepBuilderTest {
   public void testAuthenticationTypeEquals() {
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
 
     assertEquals(testBuildStep.authenticationTypeEquals("windowsAuthentication"), "false");
     assertEquals(testBuildStep.authenticationTypeEquals("serverAuthentication"), "true");
@@ -150,7 +151,7 @@ public class TestStepBuilderTest {
   public void testRunTestModeEquals() {
 
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
-      authenticationType, userName, password, runTestMode, runTests);
+      authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
 
     assertEquals(testBuildStep.runTestModeEquals("runAll"), "false");
     assertEquals(testBuildStep.runTestModeEquals("runOnly"), "true");

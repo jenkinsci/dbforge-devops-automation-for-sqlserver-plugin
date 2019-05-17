@@ -7,9 +7,9 @@ import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
-import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -26,7 +26,7 @@ public class TestStepBuilder extends BaseStepBuilder {
 
   @DataBoundConstructor
   public TestStepBuilder(String packageId, String serverType, String server, String database, String authenticationType,
-                         String userName, String password, String runTestMode, String runTests) {
+                         String userName, Secret password, String runTestMode, String runTests) {
 
     super(packageId, serverType, server, authenticationType, userName, password, database);
     this.runTestMode = runTestMode;
@@ -111,7 +111,6 @@ public class TestStepBuilder extends BaseStepBuilder {
     return command;
   }
 
-  @Symbol("greet")
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
