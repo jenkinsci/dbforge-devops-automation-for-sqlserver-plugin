@@ -11,10 +11,9 @@
 
     <artifactId>dbforge-devops-automation-for-sqlserver</artifactId>
     <name>dbForge DevOps Automation for SQL Server</name>
-    <version>1.0.69</version>
+    <version>1.0.69-SNAPSHOT</version>
     <description>Extend DevOps processes to your SQL Server databases. Develop, source control, and safely automate deployments of database changes with dbForge DevOps Automation for SQL Server.</description>
     <url>https://wiki.jenkins.io/x/FYRaCg</url>
-	<version>2.0.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
