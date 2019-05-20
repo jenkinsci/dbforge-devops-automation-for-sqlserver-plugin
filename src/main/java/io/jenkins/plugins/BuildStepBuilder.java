@@ -1,5 +1,6 @@
 package io.jenkins.plugins;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -48,17 +49,19 @@ public class BuildStepBuilder extends BaseStepBuilder {
   }
 
   @Override
-  public boolean prebuild(Build build, BuildListener listener){
+  @SuppressFBWarnings
+  public boolean prebuild(Build build, BuildListener listener) {
 
-    boolean result = true;
-
-    if (sourceFolderMode.equalsIgnoreCase("subfolder")  && (!Utils.isValidPath(subfolder) || Paths.get(subfolder).isAbsolute())) {
-      ProcessStepParameterInvalid(io.jenkins.plugins.Messages.BuildStepBuilder_PropertiesNames_SubFolder(), subfolder, io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath(), listener);
-      result = false;
+    if (sourceFolderMode.equalsIgnoreCase("subfolder") && (!Utils.isValidPath(subfolder) || Paths.get(subfolder).isAbsolute())) {
+      processStepParameterInvalid(io.jenkins.plugins.Messages.BuildStepBuilder_PropertiesNames_SubFolder(), subfolder, io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath(), listener);
+      return false;
     }
 
-    result &= EnvironmentValidator.Validate(((FreeStyleProject)build.getProject()).getBuilders(), build.getWorkspace(), listener);
-    return result;
+    FreeStyleProject freeStyleProject = (FreeStyleProject) build.getProject();
+    if (freeStyleProject != null)
+      return EnvironmentValidator.validate(freeStyleProject.getBuilders(), build.getWorkspace(), listener);
+
+    return false;
   }
 
   @Override
@@ -76,8 +79,8 @@ public class BuildStepBuilder extends BaseStepBuilder {
 
     PowerShellCommand command = new PowerShellCommand();
 
-    command.AddConnectionScript(connection);
-    command.AddDatabaseBuildScript(project, connection.getConnectionName(), compareOptions);
+    command.addConnectionScript(connection);
+    command.addDatabaseBuildScript(project, connection.getConnectionName(), compareOptions);
 
     return command;
   }
@@ -110,7 +113,7 @@ public class BuildStepBuilder extends BaseStepBuilder {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingPackageId());
       if (!Utils.isValidPackageId(value))
-        return FormValidation.warning(io.jenkins.plugins.Messages.InvalidPackageId());
+        return FormValidation.warning(io.jenkins.plugins.Messages.invalidPackageId());
       return FormValidation.ok();
     }
 

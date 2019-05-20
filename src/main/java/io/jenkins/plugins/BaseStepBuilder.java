@@ -92,7 +92,7 @@ public abstract class BaseStepBuilder extends Builder {
     listener.getLogger().println(String.format("Package ID: '%s'", packageId));
 
     FilePath workspace = build.getWorkspace();
-    boolean result = preExecute(launcher, listener, workspace) && PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, getPowerShellCommand(workspace));
+    boolean result = preExecute(launcher, listener, workspace) && PowerShellExecuter.getInstance().execute(launcher, listener, workspace, getPowerShellCommand(workspace));
 
     listener.getLogger().println(String.format("Finished '%s'", getDescriptor().getDisplayName()));
     listener.getLogger().println();
@@ -111,8 +111,8 @@ public abstract class BaseStepBuilder extends Builder {
             password);
 
     if (connection.getIsLocalDb()) {
-      FilePath scriptLocation = new FilePath(workspace, Constants.PSScriptsLocation);
-      if (PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, scriptLocation, "CreateLocalDbInstance", new String[]{ConnectionInfo.LocalDbInstance}))
+      FilePath scriptLocation = new FilePath(workspace, Constants.psScriptsLocation);
+      if (PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CreateLocalDbInstance", new String[]{ConnectionInfo.localDbInstance}))
         return executeScript(launcher, listener, workspace, String.format("CREATE DATABASE \"%s\";", connection.getDatabase()));
       return false;
     }
@@ -120,7 +120,7 @@ public abstract class BaseStepBuilder extends Builder {
     return true;
   }
 
-  protected void ProcessStepParameterInvalid(String parameterName, String parameterValue, String errorMessage, BuildListener listener) {
+  protected void processStepParameterInvalid(String parameterName, String parameterValue, String errorMessage, BuildListener listener) {
 
     listener.error(getDescriptor().getDisplayName() + " has invalid parameter.");
     listener.error("\"" + parameterName +"\": \"" + parameterValue + "\"");
@@ -131,14 +131,14 @@ public abstract class BaseStepBuilder extends Builder {
 
     if (connection.getIsLocalDb()) {
       executeScript(launcher, listener, workspace, String.format("DROP DATABASE \"%s\";", connection.getDatabase()));
-      FilePath scriptLocation = new FilePath(workspace, Constants.PSScriptsLocation);
-      PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, scriptLocation, "DeleteLocalDbInstance", new String[]{ConnectionInfo.LocalDbInstance});
+      FilePath scriptLocation = new FilePath(workspace, Constants.psScriptsLocation);
+      PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "DeleteLocalDbInstance", new String[]{ConnectionInfo.localDbInstance});
     }
   }
 
   protected abstract PowerShellCommand getPowerShellCommand(FilePath workspace);
 
-  public StepIds GetStepId()
+  public StepIds getStepId()
   {
     return stepId;
   }
@@ -150,8 +150,8 @@ public abstract class BaseStepBuilder extends Builder {
       return false;
 
     PowerShellCommand command = new PowerShellCommand();
-    command.AddExecuteScript(true, fileScript);
-    boolean result = PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, command);
+    command.addExecuteScript(true, fileScript);
+    boolean result = PowerShellExecuter.getInstance().execute(launcher, listener, workspace, command);
     try {
       fileScript.delete();
     }

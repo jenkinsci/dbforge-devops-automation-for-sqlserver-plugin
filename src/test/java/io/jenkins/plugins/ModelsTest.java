@@ -58,7 +58,7 @@ public class ModelsTest {
 
     ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, true, userName, Secret.fromString(password));
     assertEquals(connectionInfo.getIsLocalDb(), true);
-    assertEquals(connectionInfo.getServer(), String.format("(LocalDb)\\%s", ConnectionInfo.LocalDbInstance));
+    assertEquals(connectionInfo.getServer(), String.format("(LocalDb)\\%s", ConnectionInfo.localDbInstance));
     assertThat(connectionInfo.getDatabase(), containsString("dbForgeDevopsTempDb"));
     assertEquals(connectionInfo.getIsWindowsAuthentication(), true);
     assertNull(connectionInfo.getUserName());

@@ -41,7 +41,7 @@ public class SyncStepBuilder extends BaseStepBuilder {
   protected boolean preExecute(Launcher launcher, TaskListener listener, FilePath workspace) {
 
     if (ProjectRepository.getInstance().getPackageProject(packageId) == null) {
-      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.PackageMustBeBuilt(), packageId));
+      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
       return false;
     }
 
@@ -55,8 +55,8 @@ public class SyncStepBuilder extends BaseStepBuilder {
     PackageProject project = ProjectRepository.getInstance().getPackageProject(packageId);
     PowerShellCommand command = new PowerShellCommand();
 
-    command.AddConnectionScript(connection);
-    command.AddSyncDatabaseScript(project.getSourceFolder(), connection.getConnectionName(), syncDatabaseInfo);
+    command.addConnectionScript(connection);
+    command.addSyncDatabaseScript(project.getSourceFolder(), connection.getConnectionName(), syncDatabaseInfo);
 
     return command;
   }
@@ -68,7 +68,7 @@ public class SyncStepBuilder extends BaseStepBuilder {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingPackageId());
       if (!Utils.isValidPackageId(value))
-        return FormValidation.warning(io.jenkins.plugins.Messages.InvalidPackageId());
+        return FormValidation.warning(io.jenkins.plugins.Messages.invalidPackageId());
       return FormValidation.ok();
     }
 

@@ -1,5 +1,6 @@
 package io.jenkins.plugins;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.*;
@@ -46,6 +47,7 @@ public class PublishStepBuilder extends Builder {
   }
 
   @Override
+  @SuppressFBWarnings
   public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
 
     listener.getLogger().println(String.format("Started '%s'", getDescriptor().getDisplayName()));
@@ -54,14 +56,15 @@ public class PublishStepBuilder extends Builder {
     boolean buildResult;
     PackageProject project = ProjectRepository.getInstance().getPackageProject(packageId);
     if (project == null) {
-      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.PackageMustBeBuilt(), packageId));
+      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
       buildResult = false;
-    } else {
+    }
+    else {
       PowerShellCommand command = new PowerShellCommand();
-      command.AddNewDatabaseProject(project);
-      command.AddPackageInfo(project.getDatabaseProjectName(), project.getId(), packageVersion);
-      command.AddPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, StringUtils.quote(nugetFeedUrl), nugetFeedUrlApi);
-      buildResult = PowerShellExecuter.getInstance().Execute(launcher, listener, build.getWorkspace(), command);
+      command.addNewDatabaseProject(project);
+      command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), packageVersion);
+      command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, StringUtils.quote(nugetFeedUrl), nugetFeedUrlApi);
+      buildResult = PowerShellExecuter.getInstance().execute(launcher, listener, build.getWorkspace(), command);
     }
 
     listener.getLogger().println(String.format("Finished '%s'", getDescriptor().getDisplayName()));
@@ -77,7 +80,7 @@ public class PublishStepBuilder extends Builder {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingPackageId());
       if (!Utils.isValidPackageId(value))
-        return FormValidation.warning(io.jenkins.plugins.Messages.InvalidPackageId());
+        return FormValidation.warning(io.jenkins.plugins.Messages.invalidPackageId());
       return FormValidation.ok();
     }
 

@@ -18,11 +18,11 @@ public class PowerShellExecuter {
   private PowerShellExecuter() {
   }
 
-  public boolean Execute(Launcher launcher, TaskListener listener, FilePath workspace, PowerShellCommand command) {
+  public boolean execute(Launcher launcher, TaskListener listener, FilePath workspace, PowerShellCommand command) {
 
     FilePath psScriptFile = Utils.generateScriptFile(listener, workspace, command.toString(), ".ps1");
     if (psScriptFile != null) {
-      boolean result = Execute(launcher, listener, workspace, psScriptFile, null, null);
+      boolean result = execute(launcher, listener, workspace, psScriptFile, null, null);
       if (!result) {
         listener.getLogger().println("Command execution failed:");
         listener.getLogger().println(command.toString());
@@ -38,7 +38,7 @@ public class PowerShellExecuter {
     return false;
   }
 
-  public boolean Execute(Launcher launcher, TaskListener listener, FilePath workspace, FilePath psScriptFile, String functionName, String[] functionParams) {
+  public boolean execute(Launcher launcher, TaskListener listener, FilePath workspace, FilePath psScriptFile, String functionName, String[] functionParams) {
 
     try {
       listener.getLogger().println("Begin Execute command:");

@@ -23,9 +23,9 @@ public class EnvironmentValidator {
     //и ее значение(на текуший момент - версия)
     static Map<StepIds, ArrayList<ComponentInfo>> stepComponentParams;
 
-    public static boolean Validate(List<Builder> builders, FilePath workspace, BuildListener listener) {
+    public static boolean validate(List<Builder> builders, FilePath workspace, BuildListener listener) {
 
-        StepComponentInitialize(builders);
+        stepComponentInitialize(builders);
 
         Map<String, ComponentInfo> checkComponents = new HashMap();
 
@@ -33,7 +33,7 @@ public class EnvironmentValidator {
         {
             if(builders.get(i) instanceof BaseStepBuilder) {
                 BaseStepBuilder builder = (BaseStepBuilder) builders.get(i);
-                StepIds si = builder.GetStepId();
+                StepIds si = builder.getStepId();
 
                 if (stepComponentParams.keySet().contains(si)) {
                     ArrayList<ComponentInfo> listStepComponents = stepComponentParams.get(si);
@@ -50,10 +50,10 @@ public class EnvironmentValidator {
         List<String> failedComponentName = new ArrayList<>();
 
         try {
-            FilePath scriptLocation = copyResourceToWorkspace(workspace, Constants.PSScriptsLocation);
+            FilePath scriptLocation = copyResourceToWorkspace(workspace, Constants.psScriptsLocation);
             Launcher launcher = scriptLocation.createLauncher(listener);
 
-            if(!PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall", new String[]{})) {
+            if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall", new String[]{})) {
 
                 result = false;
                 failedComponentName.add("dbForge DevOps Automation PowerShell for SQL Server");
@@ -61,7 +61,7 @@ public class EnvironmentValidator {
 
             for(Map.Entry<String, ComponentInfo> entry : checkComponents.entrySet())
             {
-                if(!PowerShellExecuter.getInstance().Execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall", entry.getValue().GetPSCallingParams())) {
+                if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall", entry.getValue().GetPSCallingParams())) {
                     result = false;
                     failedComponentName.add(String.format("%s, ver. %s", entry.getValue().GetComponentName(), entry.getValue().GetComponentVersion()));
                 }
@@ -87,7 +87,7 @@ public class EnvironmentValidator {
         return result;
     }
 
-    private static void StepComponentInitialize(List<Builder> builders){
+    private static void stepComponentInitialize(List<Builder> builders){
 
         stepComponentParams = new HashMap();
         ArrayList<ComponentInfo> listComponents = new ArrayList();
@@ -109,7 +109,7 @@ public class EnvironmentValidator {
             //датагенератор
             if (builders.get(i) instanceof TestStepBuilder) {
                 TestStepBuilder builder = (TestStepBuilder)builders.get(i);
-                StepIds si = builder.GetStepId();
+                StepIds si = builder.getStepId();
                 if (builder.getGenerateTestData())
                     stepComponentParams.get(si).add(ComponentInfo.GetComponentInfo(ComponentInfo.DataGenRegId));
             }

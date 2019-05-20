@@ -2,5 +2,5 @@ package io.jenkins.plugins.Models;
 
 public class Constants {
 
-    public static String PSScriptsLocation = "PowerShell/DbForgeScripts.ps1";
+    public static final String psScriptsLocation = "PowerShell/DbForgeScripts.ps1";
 }

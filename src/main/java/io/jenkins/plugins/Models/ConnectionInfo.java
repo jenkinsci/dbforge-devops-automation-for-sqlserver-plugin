@@ -4,8 +4,9 @@ import hudson.util.Secret;
 
 public class ConnectionInfo {
 
-  public static String LocalDbInstance = "DbForgeDevopsLocalDb";
-  private final String connectionName = "devartConnection", server, database, userName;
+  public static final String localDbInstance = "DbForgeDevopsLocalDb";
+  private static final String connectionName = "devartConnection";
+  private final String server, database, userName;
   private final Secret password;
   private final boolean isLocalDb, isWindowsAuthentication;
 
@@ -13,7 +14,7 @@ public class ConnectionInfo {
 
     this.isLocalDb = isLocalDb;
     if(isLocalDb){
-      this.server = String.format("(LocalDb)\\%s", LocalDbInstance);
+      this.server = String.format("(LocalDb)\\%s", localDbInstance);
       this.database = String.format("dbForgeDevopsTempDb_%s", java.util.UUID.randomUUID());
       this.isWindowsAuthentication = true;
       this.userName = null;

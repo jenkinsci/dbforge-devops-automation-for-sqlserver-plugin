@@ -2,7 +2,7 @@ package io.jenkins.plugins.Models;
 
 public class PackageProject {
 
-  private final String databaseProjectName = "devartDatabaseProjectName";
+  private static final String databaseProjectName = "devartDatabaseProjectName";
   private String id, sourceFolder;
 
   public PackageProject(String id) {

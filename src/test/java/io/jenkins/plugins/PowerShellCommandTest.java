@@ -33,9 +33,9 @@ public class PowerShellCommandTest {
     // $%s = New-DevartSqlDatabaseConnection -Server %s
     PowerShellCommand command = new PowerShellCommand();
     ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, Secret.fromString(password));
-    command.AddConnectionScript(connectionInfo);
+    command.addConnectionScript(connectionInfo);
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
-    assertThat(command.toString(), containsString(String.format("-Server \"(LocalDb)\\%s\"", ConnectionInfo.LocalDbInstance)));
+    assertThat(command.toString(), containsString(String.format("-Server \"(LocalDb)\\%s\"", ConnectionInfo.localDbInstance)));
     assertThat(command.toString(), containsString("-Database"));
     assertThat(command.toString(), containsString("-WindowsAuthentication"));
     assertThat(command.toString(), not(containsString("-UserName")));
@@ -44,7 +44,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -WindowsAuthentication true
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, true, userName, Secret.fromString(password)));
+    command.addConnectionScript(new ConnectionInfo(false, server, database, true, userName, Secret.fromString(password)));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -54,7 +54,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -UserName %s
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString("")));
+    command.addConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString("")));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -64,7 +64,7 @@ public class PowerShellCommandTest {
 
     // $%s = New-DevartSqlDatabaseConnection -Server %s -Database %s -UserName %s -Password %s
     command = new PowerShellCommand();
-    command.AddConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString(password)));
+    command.addConnectionScript(new ConnectionInfo(false, server, database, false, userName, Secret.fromString(password)));
     assertThat(command.toString(), containsString(String.format("$%s = New-DevartSqlDatabaseConnection", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-Server \"%s\"", server)));
     assertThat(command.toString(), containsString(String.format("-Database \"%s\"", database)));
@@ -82,7 +82,7 @@ public class PowerShellCommandTest {
     ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, Secret.fromString(password));
 
     // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s
-    command.AddDatabaseBuildScript(project, connectionInfo.getConnectionName(), "");
+    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), "");
     assertThat(command.toString(), containsString(String.format("$%s = Invoke-DevartDatabaseBuild", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
     assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionInfo.getConnectionName())));
@@ -91,7 +91,7 @@ public class PowerShellCommandTest {
 
     // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s -CompareOptions %s
     command = new PowerShellCommand();
-    command.AddDatabaseBuildScript(project, connectionInfo.getConnectionName(), compareOptions);
+    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), compareOptions);
     assertThat(command.toString(), containsString(String.format("$%s = Invoke-DevartDatabaseBuild", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
     assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionInfo.getConnectionName())));
@@ -106,7 +106,7 @@ public class PowerShellCommandTest {
     RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "", "");
 
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s
-    command.AddTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -121,7 +121,7 @@ public class PowerShellCommandTest {
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -UnitTests %s
     command = new PowerShellCommand();
     runTestInfo = new RunTestInfo(false, test, testResults,false, "", "");
-    command.AddTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -136,7 +136,7 @@ public class PowerShellCommandTest {
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -IncludeTestData $true -DataGeneratorProject \"%s\"
     command = new PowerShellCommand();
     runTestInfo = new RunTestInfo(true, "", testResults,true, dgen, "");
-    command.AddTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -151,7 +151,7 @@ public class PowerShellCommandTest {
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -SynchronizationOptions %s
     command = new PowerShellCommand();
     runTestInfo = new RunTestInfo(true, "", testResults,false, "", compareOptions);
-    command.AddTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -171,7 +171,7 @@ public class PowerShellCommandTest {
     SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo("", "");
 
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s
-    command.AddSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
@@ -182,7 +182,7 @@ public class PowerShellCommandTest {
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s -SynchronizationOptions %s
     command = new PowerShellCommand();
     syncDatabaseInfo = new SyncDatabaseInfo(compareOptions, "");
-    command.AddSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
@@ -193,7 +193,7 @@ public class PowerShellCommandTest {
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s -TransactionIsolationLevel %s
     command = new PowerShellCommand();
     syncDatabaseInfo = new SyncDatabaseInfo("", transactionIsoLvl);
-    command.AddSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
@@ -210,7 +210,7 @@ public class PowerShellCommandTest {
     project.setSourceFolder(sourceControlFolder);
 
     // $%s = New-DevartDatabaseProject -Path %s
-    command.AddNewDatabaseProject(project);
+    command.addNewDatabaseProject(project);
     assertThat(command.toString(), containsString(String.format("$%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString("New-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
@@ -223,7 +223,7 @@ public class PowerShellCommandTest {
     PackageProject project = new PackageProject(packageId);
 
     // Set-DevartPackageInfo -Project %s -Id %s
-    command.AddPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
+    command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
     assertThat(command.toString(), containsString("Set-DevartPackageInfo"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Id %s", project.getId())));
@@ -231,7 +231,7 @@ public class PowerShellCommandTest {
 
     // Set-DevartPackageInfo -Project %s -Id %s -Version %s
     command = new PowerShellCommand();
-    command.AddPackageInfo(project.getDatabaseProjectName(), project.getId(), packageVersion);
+    command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), packageVersion);
     assertThat(command.toString(), containsString("Set-DevartPackageInfo"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Id %s", project.getId())));
@@ -245,7 +245,7 @@ public class PowerShellCommandTest {
     PackageProject project = new PackageProject(packageId);
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s
-    command.AddPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -253,7 +253,7 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), not(containsString("-AutoIncrementVersion")));
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s -AutoIncrementVersion true
-    command.AddPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, "");
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -261,7 +261,7 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), containsString("-AutoIncrementVersion"));
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s -ApiKey %s -AutoIncrementVersion true
-    command.AddPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, nugetApi);
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, nugetApi);
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -275,9 +275,9 @@ public class PowerShellCommandTest {
     PowerShellCommand command = new PowerShellCommand();
 
     // $execute_filename = Invoke-DevartExecuteScript -Connection "Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True" -InputFile filename.sql
-    command.AddExecuteScript(true, new FilePath(new File("filename.sql")));
+    command.addExecuteScript(true, new FilePath(new File("filename.sql")));
     assertThat(command.toString(), containsString("$execute_filename = Invoke-DevartExecuteScript"));
-    assertThat(command.toString(), containsString(String.format("-Connection \"Data Source=(LocalDb)\\%s;Integrated Security=True\"", ConnectionInfo.LocalDbInstance)));
+    assertThat(command.toString(), containsString(String.format("-Connection \"Data Source=(LocalDb)\\%s;Integrated Security=True\"", ConnectionInfo.localDbInstance)));
     assertThat(command.toString(), containsString("-Input \"filename.sql\""));
     assertThat(command.toString(), containsString("if(-Not $execute_filename) { [System.Environment]::Exit(1); };"));
   }
@@ -292,14 +292,14 @@ public class PowerShellCommandTest {
     RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "", "");
     SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo("", "");
 
-    command.AddConnectionScript(connection);
-    command.AddDatabaseBuildScript(project, connection.getConnectionName(), "");
-    command.AddTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
-    command.AddSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
-    command.AddPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
-    command.AddPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
+    command.addConnectionScript(connection);
+    command.addDatabaseBuildScript(project, connection.getConnectionName(), "");
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
 
-    String[] scripts = command.toString().split(command.Separator);
+    String[] scripts = command.toString().split(command.separator);
     assertTrue(scripts.length > 7);
   }
 

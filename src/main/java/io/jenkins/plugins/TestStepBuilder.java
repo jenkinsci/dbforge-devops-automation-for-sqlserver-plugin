@@ -75,7 +75,7 @@ public class TestStepBuilder extends BaseStepBuilder {
   public boolean prebuild(Build build, BuildListener listener){
 
     if (generateTestData  && (!Utils.isValidPath(dgenFile) || Paths.get(dgenFile).isAbsolute())) {
-      ProcessStepParameterInvalid(io.jenkins.plugins.Messages.TestStepBuilder_PropertiesNames_GenerateTestDataFile(), dgenFile, io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath(), listener);
+      processStepParameterInvalid(io.jenkins.plugins.Messages.TestStepBuilder_PropertiesNames_GenerateTestDataFile(), dgenFile, io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath(), listener);
       return false;
     }
     return true;
@@ -85,7 +85,7 @@ public class TestStepBuilder extends BaseStepBuilder {
   protected boolean preExecute(Launcher launcher, TaskListener listener, FilePath workspace) {
 
     if (ProjectRepository.getInstance().getPackageProject(packageId) == null) {
-      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.PackageMustBeBuilt(), packageId));
+      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
       return false;
     }
     String outputReportFilename = new SimpleDateFormat("'dbforgeDevopsTestResults_'yyyyMMdd_HHmmss'.xml'").format(new Date());
@@ -105,8 +105,8 @@ public class TestStepBuilder extends BaseStepBuilder {
     PowerShellCommand command = new PowerShellCommand();
 
     PackageProject project = ProjectRepository.getInstance().getPackageProject(packageId);
-    command.AddConnectionScript(connection);
-    command.AddTestBuildScript(project.getSourceFolder(), connection.getConnectionName(), testInfo);
+    command.addConnectionScript(connection);
+    command.addTestBuildScript(project.getSourceFolder(), connection.getConnectionName(), testInfo);
 
     return command;
   }
@@ -118,7 +118,7 @@ public class TestStepBuilder extends BaseStepBuilder {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingPackageId());
       if (!Utils.isValidPackageId(value))
-        return FormValidation.warning(io.jenkins.plugins.Messages.InvalidPackageId());
+        return FormValidation.warning(io.jenkins.plugins.Messages.invalidPackageId());
       return FormValidation.ok();
     }
 
