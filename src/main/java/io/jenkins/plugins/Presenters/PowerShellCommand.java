@@ -61,7 +61,7 @@ public class PowerShellCommand {
       sb.append(String.format(" -SynchronizationOptions \"%s\"", testInfo.getCompareOptions()));
     addScriptSeparator();
 
-    sb.append("%nif(-Not $result) { [System.Environment]::Exit(1); }");
+    sb.append(String.format("%nif(-Not $result) { [System.Environment]::Exit(1); }"));
   }
 
   public void addSyncDatabaseScript(String scriptFolder, String targetConnectionName, SyncDatabaseInfo syncDatabaseInfo) {
@@ -77,7 +77,7 @@ public class PowerShellCommand {
       sb.append(String.format(" -SynchronizationOptions \"%s\"", syncDatabaseInfo.getCompareOptions()));
     addScriptSeparator();
 
-    sb.append("%nif(-Not $result) { [System.Environment]::Exit(1); }");
+    sb.append(String.format("%nif(-Not $result) { [System.Environment]::Exit(1); }"));
   }
 
   public void addNewDatabaseProject(PackageProject project){
