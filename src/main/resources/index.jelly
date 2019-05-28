@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-    Extend DevOps processes to your SQL Server databases. Develop, source control, and safely automate deployments of database changes with dbForge DevOps Automation for SQL Server.
+    Devart dbForge DevOps Automation for SQL Server is designed for establishing the Continuous Integration process in Jenkins when developing SQL Server databases.
 </div>
