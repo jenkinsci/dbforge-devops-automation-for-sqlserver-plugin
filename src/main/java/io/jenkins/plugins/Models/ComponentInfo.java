@@ -14,7 +14,7 @@ public class ComponentInfo {
 
     static{
 
-        PossibleComponents.put(SchemaCompareRegId,  new ComponentInfo(SchemaCompareRegId, "4.6.44", "dbForge Schema Compare for SQL Server"));
+        PossibleComponents.put(SchemaCompareRegId,  new ComponentInfo(SchemaCompareRegId, "5.0.34", "dbForge Schema Compare for SQL Server"));
         PossibleComponents.put(UnitTestRegId,       new ComponentInfo(UnitTestRegId, "1.5.48", "dbForge Unit Test for SQL Server"));
         PossibleComponents.put(DataGenRegId,        new ComponentInfo(DataGenRegId, "4.2.52", "dbForge Data Generator for SQL Server"));
         PossibleComponents.put(DocumenterRegId,     new ComponentInfo(DocumenterRegId, "9.9.99", "dbForge Documenter for SQL Server"));
