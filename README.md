@@ -1,37 +1,44 @@
-# dbForge DevOps Automation for SQL Server Plugin
+## Summary
 
-## Introduction
+Devart dbForge DevOps Automation for SQL Server is designed for
+establishing the Continuous Integration process in Jenkins when
+developing SQL Server databases.
 
-Devart dbForge DevOps Automation for SQL Server Plugin is an open-source plugin for using [dbForge DevOps Automation PowerShell for SQL Server](https://www.devart.com/dbforge/sql/) in Jenkins. There are four tasks available:
+## Features
 
-1. Build - deploys a database on LocalDB or on a specified SQL Server and generates a NuGet package from a Source control repository.
-2. Test - runs tSQLt and generates test data.
-3. Sync - deploys a NuGet package and synchronizes it with a working DB.
-4. Publish - places a NuGet Package to a NuGet feed for further deployment.
+dbForge DevOps Automation allows establishing the flowing stages of
+Continuous Integration within a Jenkins project:
 
-## Installing
-If you want to use just the plugin, perform the following steps:
+-   **Build** - deploys a database on LocalDB or on a specified SQL
+    Server and generate NuGet package from a Source control repository.
+-   **Test** - runs tSQLt and generates test data.
+-   **Sync** - deploys a NuGet package and synchronizes it with a
+    working DB.
+-   **Publish** - places a NuGet Package to a NuGet feed for further
+    deployment.
 
-1. Open your Jenkins.
-2. Go to Manage Jenkins -> Manage Plugins -> Available, and search for Devart.
-3. Select dbForge DevOps Automation for SQL Server Plugin, and click 'Install Without Restart'
+## Requirements
 
-## How to build/debug the plugin.
+#### dbForge Developer Bundle
 
-A basic tutorial for developing plugins is available at https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial.
+The dbForge DevOps Automation for SQL Server plugin requires
+installation of traditional dbForge tools for its work. All the tools
+required for establishing the DevOps process in Jenkins are included in
+[dbForge SQL Tools](https://www.devart.com/dbforge/sql/sql-tools/download.html){.external-link}.
+ALL THE TOOLS THAT ARE USED BY dbForge DevOps Automation for SQL Server
+HAVE a trial period.
 
-Perform the following steps:
+#### Jenkins
 
-1. Clone this repository.
-2. Install Maven.
-3. Open a command prompt in the repository root directory. Then run:
-set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n
-mvn hpi:run 
-4. Install the dbForge DevOps Automation PowerShell module from [powershell gallery](https://www.powershellgallery.com/packages/Devart.DbForge.DevOpsAutomation.SqlServer) or [dbForge DevOps Automation PowerShell for SQL Server](https://www.devart.com/dbforge/sql/).
-
-JetBrains IntelliJ IDEA is a good environment for developing and debugging Jenkins plugins. There is a free community edition.
+Jenkins [version
+2.150](https://jenkins.io/changelog#v2.150){.external-link} or newer is
+required.
 
 ## Help Us to Make it Better
-If you have any ideas of how to improve dbForge DevOps Automation for SQL Server Plugin, submit a pull request with your code to us. Upon approval, we WILL IMPLEMENT the suggested changes.
 
-You can also email us at support@devart.com
+If you have any ideas of how to improve dbForge DevOps Automation for
+SQL Server, submit a pull request with your code to us. Upon approval,
+we WILL IMPLEMENT the suggested changes.
+
+You can also email us at
+[support@devart.com](https://wiki.jenkins.io/display/JENKINS/mailto:support@devart.com){.external-link}
