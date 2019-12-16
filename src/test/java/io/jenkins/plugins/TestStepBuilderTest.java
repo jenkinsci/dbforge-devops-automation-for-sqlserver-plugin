@@ -19,7 +19,7 @@ public class TestStepBuilderTest {
   private final String packageId = "id", runTestMode = "runOnly", runTests = "testName";
   private final String serverType = "server", authenticationType = "serverAuthentication";
   private final String server = "srv", database = "db", userName = "su", password = "su";
-  private final String dgenFile = "dgenFile.dgen", compareOptions = "compareOptions";
+  private final String dgenFile = "dgenFile.dgen", compareOptions = "compareOptions", filterFile = "filter.scflt";
   private final boolean generateTestData = true;
 
   @Test
@@ -33,6 +33,7 @@ public class TestStepBuilderTest {
     TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
       authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setCompareOptions("");
+    testBuildStep.setFilterFile("");
     testBuildStep.setDgenFile("");
     jenkins.assertEqualDataBoundBeans(testBuildStep, project.getBuildersList().get(0));
   }
@@ -46,6 +47,7 @@ public class TestStepBuilderTest {
     builder.setGenerateTestData(generateTestData);
     builder.setDgenFile(dgenFile);
     builder.setCompareOptions(compareOptions);
+    builder.setFilterFile(filterFile);
     project.getBuildersList().add(builder);
     project = jenkins.configRoundtrip(project);
 
@@ -54,6 +56,7 @@ public class TestStepBuilderTest {
     testBuildStep.setGenerateTestData(generateTestData);
     testBuildStep.setDgenFile(dgenFile);
     testBuildStep.setCompareOptions(compareOptions);
+    testBuildStep.setFilterFile(filterFile);
     jenkins.assertEqualDataBoundBeans(testBuildStep, project.getBuildersList().get(0));
   }
 
@@ -65,6 +68,7 @@ public class TestStepBuilderTest {
     testBuildStep.setGenerateTestData(generateTestData);
     testBuildStep.setDgenFile(dgenFile);
     testBuildStep.setCompareOptions(compareOptions);
+    testBuildStep.setFilterFile(filterFile);
 
     assertEquals(testBuildStep.getPackageId(), packageId);
     assertEquals(testBuildStep.getServerType(), serverType);
@@ -78,6 +82,7 @@ public class TestStepBuilderTest {
     assertEquals(testBuildStep.getGenerateTestData(), generateTestData);
     assertEquals(testBuildStep.getDgenFile(), dgenFile);
     assertEquals(testBuildStep.getCompareOptions(), compareOptions);
+    assertEquals(testBuildStep.getFilterFile(), filterFile);
   }
 
   @Test
@@ -111,7 +116,22 @@ public class TestStepBuilderTest {
   }
 
   @Test
-  public void testPrebuildFailed() throws Exception {
+  public void testPrebuildSuccess3() throws Exception {
+
+    FreeStyleProject project = jenkins.createFreeStyleProject();
+
+    TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
+            authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
+    testBuildStep.setFilterFile(filterFile);
+    project.getBuildersList().add(testBuildStep);
+
+    FreeStyleBuild build = project.scheduleBuild2(0).get();
+    jenkins.assertLogNotContains("has invalid parameter", build);
+    jenkins.assertLogContains(String.format("Started '%s'", testBuildStep.getDescriptor().getDisplayName()), build);
+  }
+
+  @Test
+  public void testPrebuildHasInvalidParameter1() throws Exception {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
 
@@ -119,6 +139,22 @@ public class TestStepBuilderTest {
             authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
     testBuildStep.setGenerateTestData(true);
     testBuildStep.setDgenFile("D:/D:/");
+    project.getBuildersList().add(testBuildStep);
+
+    FreeStyleBuild build = project.scheduleBuild2(0).get();
+    assertTrue(build.getResult() == Result.FAILURE);
+    jenkins.assertLogNotContains(String.format("Started '%s'", testBuildStep.getDescriptor().getDisplayName()), build);
+    jenkins.assertLogContains("has invalid parameter", build);
+  }
+
+  @Test
+  public void testPrebuildHasInvalidParameter2() throws Exception {
+
+    FreeStyleProject project = jenkins.createFreeStyleProject();
+
+    TestStepBuilder testBuildStep = new TestStepBuilder(packageId, serverType, server, database,
+            authenticationType, userName, Secret.fromString(password), runTestMode, runTests);
+    testBuildStep.setFilterFile("qwerty");
     project.getBuildersList().add(testBuildStep);
 
     FreeStyleBuild build = project.scheduleBuild2(0).get();

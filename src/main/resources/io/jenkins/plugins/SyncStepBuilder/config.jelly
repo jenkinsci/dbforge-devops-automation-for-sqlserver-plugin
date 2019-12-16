@@ -38,10 +38,13 @@
   </f:section>
   <f:advanced>
     <f:section title="${%AdvancedSection}">
-      <f:entry title="${%CompareOptions}" field="compareOptions">
+      <f:entry title="${%CompareOptions}" field="compareOptions" help="/plugin/dbforge-devops-automation-for-sqlserver/help-compareOptions.html">
         <f:textbox />
       </f:entry>
-      <f:entry title="${%TransactionIsoLvl}" field="transactionIsoLvl">
+      <f:entry title="${%FilterFile}" field="filterFile" help="/plugin/dbforge-devops-automation-for-sqlserver/help-compareFilter.html">
+        <f:textbox />
+      </f:entry>
+      <f:entry title="${%TransactionIsoLvl}" field="transactionIsoLvl" help="/plugin/dbforge-devops-automation-for-sqlserver/help-transactionIsoLvl.html">
         <select name="transactionIsoLvl">
           <option value="Serializable">Serializable</option>
           <option value="Snapshot">Snapshot</option>

@@ -1,5 +1,6 @@
 package io.jenkins.plugins;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -72,13 +73,15 @@ public class TestStepBuilder extends BaseStepBuilder {
   }
 
   @Override
+  @SuppressFBWarnings
   public boolean prebuild(Build build, BuildListener listener){
 
     if (generateTestData  && (!Utils.isValidPath(dgenFile) || Paths.get(dgenFile).isAbsolute())) {
       processStepParameterInvalid(io.jenkins.plugins.Messages.TestStepBuilder_PropertiesNames_GenerateTestDataFile(), dgenFile, io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath(), listener);
       return false;
     }
-    return true;
+
+    return validateFilterFile(listener);
   }
 
   @Override
@@ -93,9 +96,10 @@ public class TestStepBuilder extends BaseStepBuilder {
             runTests,
             Paths.get(workspace.getRemote(), outputReportFilename).toString(),
             generateTestData,
-            generateTestData ? Paths.get(workspace.getRemote(), new String[]{dgenFile}).toString() : "",
-            compareOptions
+            generateTestData ? Paths.get(workspace.getRemote(), new String[]{dgenFile}).toString() : ""
+
     );
+
     return super.preExecute(launcher, listener, workspace);
   }
 
@@ -106,7 +110,7 @@ public class TestStepBuilder extends BaseStepBuilder {
 
     PackageProject project = ProjectRepository.getInstance().getPackageProject(packageId);
     command.addConnectionScript(connection);
-    command.addTestBuildScript(project.getSourceFolder(), connection.getConnectionName(), testInfo);
+    command.addTestBuildScript(project.getSourceFolder(), connection.getConnectionName(), testInfo, additionalOptions);
 
     return command;
   }
@@ -143,6 +147,16 @@ public class TestStepBuilder extends BaseStepBuilder {
     public FormValidation doCheckDgenFile(@QueryParameter String value) {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.TestStepBuilder_DescriptorImpl_errors_missingDgenPath());
+      if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
+      return FormValidation.ok();
+    }
+
+    public FormValidation doCheckFilterFile(@QueryParameter String value) {
+      if (value.length() == 0)
+        return FormValidation.ok();
+      if (!value.endsWith(".scflt"))
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongScfltPath());
       if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
       return FormValidation.ok();

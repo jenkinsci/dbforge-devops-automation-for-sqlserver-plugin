@@ -3,7 +3,6 @@
 
 Function CheckRequiredComponentInstall($key, $name, $value)
 {
-
   $ErrorActionPreference = "Stop"
   $regValue = $false
   $type = [Microsoft.Win32.RegistryHive]::LocalMachine
@@ -33,13 +32,13 @@ Function CheckRequiredComponentInstall($key, $name, $value)
   }
 }
 
-Function CheckPowerShellInstall()
+Function CheckPowerShellInstall($name, $version)
 {
-  $dbForgeDevopsPSModule = "Devart.DbForge.DevOpsAutomation.SqlServer"
   try
   {
-    if (Get-Module -ListAvailable -Name $dbForgeDevopsPSModule) {
- 	  [System.Environment]::Exit(0)
+    $dbForgeDevopsPSModule = Get-Module -ListAvailable -Name $name
+    if ($dbForgeDevopsPSModule.Version -ge $version) {
+        [System.Environment]::Exit(0)
     }
     [System.Environment]::Exit(1)
   }
@@ -52,7 +51,6 @@ Function CheckPowerShellInstall()
 
 Function CreateLocalDbInstance($localDbName)
 {
-
   $ErrorActionPreference = "Stop"
 
   try

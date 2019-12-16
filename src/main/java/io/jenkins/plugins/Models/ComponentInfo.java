@@ -4,6 +4,10 @@ import java.util.HashMap;
 
 public class ComponentInfo {
 
+    public static final String PowerShellModuleFullName    = "dbForge DevOps Automation PowerShell for SQL Server";
+    public static final String PowerShellModuleName        = "Devart.DbForge.DevOpsAutomation.SqlServer";
+    public static final String PowerShellModuleMinVersion  = "1.0.127";
+
     public static final String DataGenRegId        = "DevartDataGeneratorMSSql_is1";
     public static final String UnitTestRegId       = "DevartUnitTest_is1";
     public static final String SchemaCompareRegId  = "DevartSchemaCompareMSSql_is1";
@@ -14,7 +18,7 @@ public class ComponentInfo {
 
     static{
 
-        PossibleComponents.put(SchemaCompareRegId,  new ComponentInfo(SchemaCompareRegId, "5.0.34", "dbForge Schema Compare for SQL Server"));
+        PossibleComponents.put(SchemaCompareRegId,  new ComponentInfo(SchemaCompareRegId, "5.0.57", "dbForge Schema Compare for SQL Server"));
         PossibleComponents.put(UnitTestRegId,       new ComponentInfo(UnitTestRegId, "1.5.48", "dbForge Unit Test for SQL Server"));
         PossibleComponents.put(DataGenRegId,        new ComponentInfo(DataGenRegId, "4.2.52", "dbForge Data Generator for SQL Server"));
         PossibleComponents.put(DocumenterRegId,     new ComponentInfo(DocumenterRegId, "9.9.99", "dbForge Documenter for SQL Server"));

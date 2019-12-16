@@ -9,14 +9,20 @@ import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.nio.file.Paths;
+
 public abstract class BaseStepBuilder extends Builder {
 
   private final String serverType, authenticationType, server, database, userName;
   private final Secret password;
   protected final String packageId;
   protected StepIds stepId;
-  protected String compareOptions;
   protected ConnectionInfo connection;
+
+  protected AdditionalOptionsModel additionalOptions;
+  private String filterFile;
+  private String compareOptions;
+  private String transactionIsoLvl = "Serializable";
 
   public BaseStepBuilder(String packageId, String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
@@ -27,6 +33,11 @@ public abstract class BaseStepBuilder extends Builder {
     this.authenticationType = authenticationType;
     this.userName = userName;
     this.password = password;
+  }
+
+  public StepIds getStepId() {
+
+    return stepId;
   }
 
   public String getPackageId() {
@@ -64,15 +75,37 @@ public abstract class BaseStepBuilder extends Builder {
     return password;
   }
 
+  public String getFilterFile() {
+
+    return filterFile;
+  }
+
   public String getCompareOptions() {
 
     return compareOptions;
+  }
+
+  public String getTransactionIsoLvl() {
+
+    return transactionIsoLvl;
   }
 
   @DataBoundSetter
   public void setCompareOptions(String compareOptions) {
 
     this.compareOptions = compareOptions;
+  }
+
+  @DataBoundSetter
+  public void setFilterFile(String filterFile) {
+
+    this.filterFile = filterFile;
+  }
+
+  @DataBoundSetter
+  public void setTransactionIsoLvl(String transactionIsoLvl) {
+
+    this.transactionIsoLvl = transactionIsoLvl;
   }
 
   public String serverTypeEquals(String serverType) {
@@ -110,6 +143,10 @@ public abstract class BaseStepBuilder extends Builder {
             userName,
             password);
 
+    additionalOptions = new AdditionalOptionsModel(compareOptions,
+            getFilterFile() == null || getFilterFile().isEmpty() ? "" : Paths.get(workspace.getRemote(), new String[]{getFilterFile()}).toString(),
+            transactionIsoLvl);
+
     if (connection.getIsLocalDb()) {
       FilePath scriptLocation = new FilePath(workspace, Constants.psScriptsLocation);
       if (PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CreateLocalDbInstance", new String[]{ConnectionInfo.localDbInstance}))
@@ -117,6 +154,18 @@ public abstract class BaseStepBuilder extends Builder {
       return false;
     }
 
+    return true;
+  }
+
+  protected boolean validateFilterFile(BuildListener listener) {
+
+    if (filterFile != null
+            && filterFile.length() != 0
+            && (!filterFile.endsWith(".scflt") || !Utils.isValidPath(filterFile) || Paths.get(filterFile).isAbsolute())) {
+      processStepParameterInvalid(io.jenkins.plugins.Messages.BuildStepBuilder_PropertiesNames_FilterFile(), filterFile,
+              io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongScfltPath(), listener);
+      return false;
+    }
     return true;
   }
 
@@ -137,11 +186,6 @@ public abstract class BaseStepBuilder extends Builder {
   }
 
   protected abstract PowerShellCommand getPowerShellCommand(FilePath workspace);
-
-  public StepIds getStepId()
-  {
-    return stepId;
-  }
 
   private boolean executeScript(Launcher launcher, TaskListener listener, FilePath workspace, String script){
 

@@ -53,15 +53,15 @@ public class EnvironmentValidator {
             FilePath scriptLocation = copyResourceToWorkspace(workspace, Constants.psScriptsLocation);
             Launcher launcher = scriptLocation.createLauncher(listener);
 
-            if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall", new String[]{})) {
-
+            if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall",
+                    new String[]{ComponentInfo.PowerShellModuleName, ComponentInfo.PowerShellModuleMinVersion})) {
                 result = false;
-                failedComponentName.add("dbForge DevOps Automation PowerShell for SQL Server");
+                failedComponentName.add(String.format("%s, ver. %s", ComponentInfo.PowerShellModuleFullName, ComponentInfo.PowerShellModuleMinVersion));
             }
 
-            for(Map.Entry<String, ComponentInfo> entry : checkComponents.entrySet())
-            {
-                if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall", entry.getValue().GetPSCallingParams())) {
+            for(Map.Entry<String, ComponentInfo> entry : checkComponents.entrySet()) {
+                if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall",
+                        entry.getValue().GetPSCallingParams())) {
                     result = false;
                     failedComponentName.add(String.format("%s, ver. %s", entry.getValue().GetComponentName(), entry.getValue().GetComponentVersion()));
                 }

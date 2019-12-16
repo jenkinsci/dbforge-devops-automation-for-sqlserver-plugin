@@ -25,7 +25,7 @@ public class PowerShellCommandTest {
   private final String packageId = "id", packageVersion = "1.0.1", nugetRepository = "repository", nugetApi = "api",
     connectionName = "connectionName", server = "srv", database = "db", userName = "su", password = "su",
     test = "test1", testResults = "testResults", dgen = "dgen", sourceControlFolder = "sourceControlFolder",
-    compareOptions = "compareOptions", transactionIsoLvl = "Serializable";
+    compareOptions = "compareOptions", filterFile = "filter.scflt", transactionIsoLvl = "Serializable";
 
   @Test
   public void testAddConnectionScript() {
@@ -80,22 +80,37 @@ public class PowerShellCommandTest {
     PackageProject project = new PackageProject(packageId);
     project.setSourceFolder(sourceControlFolder);
     ConnectionInfo connectionInfo = new ConnectionInfo(true, server, database, false, userName, Secret.fromString(password));
+    AdditionalOptionsModel additionalOptions = new AdditionalOptionsModel("", "", null);
 
     // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s
-    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), "");
+    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), additionalOptions);
     assertThat(command.toString(), containsString(String.format("$%s = Invoke-DevartDatabaseBuild", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
     assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionInfo.getConnectionName())));
     assertThat(command.toString(), not(containsString("-CompareOptions")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), containsString(String.format("if(-Not $%s.Valid) { [System.Environment]::Exit(1); }", project.getDatabaseProjectName())));
 
     // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s -CompareOptions %s
     command = new PowerShellCommand();
-    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), compareOptions);
+    additionalOptions = new AdditionalOptionsModel(compareOptions, "", null);
+    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), additionalOptions);
     assertThat(command.toString(), containsString(String.format("$%s = Invoke-DevartDatabaseBuild", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
     assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionInfo.getConnectionName())));
     assertThat(command.toString(), containsString(String.format("-SynchronizationOptions \"%s\"", compareOptions)));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
+    assertThat(command.toString(), containsString(String.format("if(-Not $%s.Valid) { [System.Environment]::Exit(1); }", project.getDatabaseProjectName())));
+
+    // $%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder %s -Connection $%s -CompareOptions %s -FilterPath %s
+    command = new PowerShellCommand();
+    additionalOptions = new AdditionalOptionsModel(compareOptions, filterFile, null);
+    command.addDatabaseBuildScript(project, connectionInfo.getConnectionName(), additionalOptions);
+    assertThat(command.toString(), containsString(String.format("$%s = Invoke-DevartDatabaseBuild", project.getDatabaseProjectName())));
+    assertThat(command.toString(), containsString(String.format("-SourceScriptsFolder \"%s\"", project.getSourceFolder())));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionInfo.getConnectionName())));
+    assertThat(command.toString(), containsString(String.format("-SynchronizationOptions \"%s\"", compareOptions)));
+    assertThat(command.toString(), containsString(String.format("-FilterPath \"%s\"", filterFile)));
     assertThat(command.toString(), containsString(String.format("if(-Not $%s.Valid) { [System.Environment]::Exit(1); }", project.getDatabaseProjectName())));
   }
 
@@ -103,10 +118,11 @@ public class PowerShellCommandTest {
   public void testAddTestBuildScript() {
 
     PowerShellCommand command = new PowerShellCommand();
-    RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "", "");
+    RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "");
+    AdditionalOptionsModel additionalOptions = new AdditionalOptionsModel("", "", null);
 
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s
-    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptions);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -115,13 +131,14 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), not(containsString("-UnitTests")));
     assertThat(command.toString(), not(containsString("-IncludeTestData")));
     assertThat(command.toString(), not(containsString("-DataGeneratorProject")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
 
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -UnitTests %s
     command = new PowerShellCommand();
-    runTestInfo = new RunTestInfo(false, test, testResults,false, "", "");
-    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    runTestInfo = new RunTestInfo(false, test, testResults,false, "");
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptions);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -130,13 +147,14 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), containsString(String.format("-UnitTests \"%s\"", test)));
     assertThat(command.toString(), not(containsString("-IncludeTestData")));
     assertThat(command.toString(), not(containsString("-DataGeneratorProject")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
 
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -IncludeTestData $true -DataGeneratorProject \"%s\"
     command = new PowerShellCommand();
-    runTestInfo = new RunTestInfo(true, "", testResults,true, dgen, "");
-    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    runTestInfo = new RunTestInfo(true, "", testResults,true, dgen);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptions);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -145,13 +163,15 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), not(containsString("-UnitTests")));
     assertThat(command.toString(), containsString("-IncludeTestData"));
     assertThat(command.toString(), containsString(String.format("-DataGeneratorProject \"%s\"", dgen)));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
 
     // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -SynchronizationOptions %s
     command = new PowerShellCommand();
-    runTestInfo = new RunTestInfo(true, "", testResults,false, "", compareOptions);
-    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
+    runTestInfo = new RunTestInfo(true, "", testResults,false, "");
+    additionalOptions = new AdditionalOptionsModel(compareOptions, "", null);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptions);
     assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
     assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
@@ -160,6 +180,24 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), not(containsString("-UnitTests")));
     assertThat(command.toString(), not(containsString("-IncludeTestData")));
     assertThat(command.toString(), not(containsString("-DataGeneratorProject")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
+    assertThat(command.toString(), containsString(String.format("-SynchronizationOptions \"%s\"", compareOptions)));
+    assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
+
+    // Invoke-DevartDatabaseTests -InputObject %s -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -FilterPath %s -SynchronizationOptions %s
+    command = new PowerShellCommand();
+    runTestInfo = new RunTestInfo(true, "", testResults,false, "");
+    additionalOptions = new AdditionalOptionsModel(compareOptions, filterFile, null);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptions);
+    assertThat(command.toString(), containsString("$result = Invoke-DevartDatabaseTests"));
+    assertThat(command.toString(), containsString(String.format("-InputObject \"%s\"", sourceControlFolder)));
+    assertThat(command.toString(), containsString(String.format("-TemporaryDatabaseServer $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-OutReportFileName:\"%s\"", testResults)));
+    assertThat(command.toString(), containsString("-ReportFormat"));
+    assertThat(command.toString(), not(containsString("-UnitTests")));
+    assertThat(command.toString(), not(containsString("-IncludeTestData")));
+    assertThat(command.toString(), not(containsString("-DataGeneratorProject")));
+    assertThat(command.toString(), containsString(String.format("-FilterPath \"%s\"", filterFile)));
     assertThat(command.toString(), containsString(String.format("-SynchronizationOptions \"%s\"", compareOptions)));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
   }
@@ -168,36 +206,51 @@ public class PowerShellCommandTest {
   public void testAddSyncBuildScript() {
 
     PowerShellCommand command = new PowerShellCommand();
-    SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo("", "");
+    AdditionalOptionsModel additionalOptionsModel = new AdditionalOptionsModel("", "", "");
 
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s
-    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
     assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), not(containsString("-TransactionIsolationLevel")));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
 
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s -SynchronizationOptions %s
     command = new PowerShellCommand();
-    syncDatabaseInfo = new SyncDatabaseInfo(compareOptions, "");
-    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    additionalOptionsModel = new AdditionalOptionsModel(compareOptions, "","");
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
     assertThat(command.toString(), containsString(String.format("-SynchronizationOptions \"%s\"", compareOptions)));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
+    assertThat(command.toString(), not(containsString("-TransactionIsolationLevel")));
+    assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
+
+    // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s -FilterPath %s
+    command = new PowerShellCommand();
+    additionalOptionsModel = new AdditionalOptionsModel("", filterFile, "");
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
+    assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
+    assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
+    assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
+    assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
+    assertThat(command.toString(), containsString(String.format("-FilterPath \"%s\"", filterFile)));
     assertThat(command.toString(), not(containsString("-TransactionIsolationLevel")));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
 
     // Invoke-DevartSyncDatabaseSchema -Source %s -Target $%s -TransactionIsolationLevel %s
     command = new PowerShellCommand();
-    syncDatabaseInfo = new SyncDatabaseInfo("", transactionIsoLvl);
-    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    additionalOptionsModel = new AdditionalOptionsModel("", "", transactionIsoLvl);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
     assertThat(command.toString(), containsString("$result = Invoke-DevartSyncDatabaseSchema"));
     assertThat(command.toString(), containsString(String.format("-Source \"%s\"", sourceControlFolder)));
     assertThat(command.toString(), containsString(String.format("-Target $%s", connectionName)));
     assertThat(command.toString(), not(containsString("-SynchronizationOptions")));
+    assertThat(command.toString(), not(containsString("-FilterPath")));
     assertThat(command.toString(), containsString(String.format("-TransactionIsolationLevel %s", transactionIsoLvl)));
     assertThat(command.toString(), containsString("if(-Not $result) { [System.Environment]::Exit(1); }"));
   }
@@ -289,13 +342,13 @@ public class PowerShellCommandTest {
     PackageProject project = new PackageProject(packageId);
     project.setSourceFolder(sourceControlFolder);
     ConnectionInfo connection = new ConnectionInfo(false, server, database, false, userName, Secret.fromString(password));
-    RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "", "");
-    SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo("", "");
+    RunTestInfo runTestInfo = new RunTestInfo(true, "", testResults,false, "");
+    AdditionalOptionsModel additionalOptionsModel = new AdditionalOptionsModel("", "", "");
 
     command.addConnectionScript(connection);
-    command.addDatabaseBuildScript(project, connection.getConnectionName(), "");
-    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo);
-    command.addSyncDatabaseScript(sourceControlFolder, connectionName, syncDatabaseInfo);
+    command.addDatabaseBuildScript(project, connection.getConnectionName(), additionalOptionsModel);
+    command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptionsModel);
+    command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
     command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
     command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
 

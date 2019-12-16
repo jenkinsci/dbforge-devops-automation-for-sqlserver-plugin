@@ -19,7 +19,7 @@ public class BuildStepBuilderTest {
   private final String sourceFolderMode = "subfolder", subfolder = "folder", packageId = "id";
   private final String serverType = "server", authenticationType = "serverAuthentication";
   private final String server = "srv", database = "db", userName = "su", password = "su";
-  private final String compareOptions = "compareOptions";
+  private final String compareOptions = "compareOptions", filterFile = "filter.scflt";
 
   @Test
   public void testConfigRoundtrip() throws Exception {
@@ -32,6 +32,7 @@ public class BuildStepBuilderTest {
     BuildStepBuilder testBuildStep = new BuildStepBuilder(sourceFolderMode, subfolder, packageId,
       serverType, server, authenticationType, userName, Secret.fromString(password), database);
     testBuildStep.setCompareOptions("");
+    testBuildStep.setFilterFile("");
     jenkins.assertEqualDataBoundBeans(testBuildStep, project.getBuildersList().get(0));
   }
 
@@ -42,12 +43,14 @@ public class BuildStepBuilderTest {
     BuildStepBuilder builder = new BuildStepBuilder(sourceFolderMode, subfolder, packageId,
       serverType, server, authenticationType, userName, Secret.fromString(password), database);
     builder.setCompareOptions(compareOptions);
+    builder.setFilterFile(filterFile);
     project.getBuildersList().add(builder);
     project = jenkins.configRoundtrip(project);
 
     BuildStepBuilder testBuildStep = new BuildStepBuilder(sourceFolderMode, subfolder, packageId,
       serverType, server, authenticationType, userName, Secret.fromString(password), database);
     testBuildStep.setCompareOptions(compareOptions);
+    testBuildStep.setFilterFile(filterFile);
     jenkins.assertEqualDataBoundBeans(testBuildStep, project.getBuildersList().get(0));
   }
 
@@ -57,6 +60,7 @@ public class BuildStepBuilderTest {
     BuildStepBuilder testBuildStep = new BuildStepBuilder(sourceFolderMode, subfolder, packageId,
       serverType, server, authenticationType, userName, Secret.fromString(password), database);
     testBuildStep.setCompareOptions(compareOptions);
+    testBuildStep.setFilterFile(filterFile);
 
     assertEquals(testBuildStep.getSourceFolderMode(), sourceFolderMode);
     assertEquals(testBuildStep.getSubfolder(), subfolder);
@@ -68,6 +72,7 @@ public class BuildStepBuilderTest {
     assertEquals(testBuildStep.getPassword(), Secret.fromString(password));
     assertEquals(testBuildStep.getDatabase(), database);
     assertEquals(testBuildStep.getCompareOptions(), compareOptions);
+    assertEquals(testBuildStep.getFilterFile(), filterFile);
   }
 
   @Test
@@ -95,7 +100,35 @@ public class BuildStepBuilderTest {
   }
 
   @Test
-  public void testPrebuildHasInvalidParameter() throws Exception {
+  public void testPrebuildHasValidParameter3() throws Exception {
+
+    FreeStyleProject project = jenkins.createFreeStyleProject();
+    BuildStepBuilder testBuildStep = new BuildStepBuilder("vcsroot", subfolder, packageId,
+            serverType, server, authenticationType, userName, Secret.fromString(password), database);
+    testBuildStep.setFilterFile(filterFile);
+    project.getBuildersList().add(testBuildStep);
+
+    FreeStyleBuild build = project.scheduleBuild2(0).get();
+    jenkins.assertLogNotContains("has invalid parameter", build);
+  }
+
+  @Test
+  public void testPrebuildHasInvalidParameter1() throws Exception {
+
+    FreeStyleProject project = jenkins.createFreeStyleProject();
+    BuildStepBuilder testBuildStep = new BuildStepBuilder(sourceFolderMode, subfolder, packageId,
+            serverType, server, authenticationType, userName, Secret.fromString(password), database);
+    testBuildStep.setFilterFile("qwerty");
+    project.getBuildersList().add(testBuildStep);
+
+    FreeStyleBuild build = project.scheduleBuild2(0).get();
+    assertTrue(build.getResult() == Result.FAILURE);
+    jenkins.assertLogNotContains(String.format("Started '%s'", testBuildStep.getDescriptor().getDisplayName()), build);
+    jenkins.assertLogContains("has invalid parameter", build);
+  }
+
+  @Test
+  public void testPrebuildHasInvalidParameter2() throws Exception {
 
     FreeStyleProject project = jenkins.createFreeStyleProject();
     BuildStepBuilder testBuildStep = new BuildStepBuilder(sourceFolderMode, "D:/D:/", packageId,

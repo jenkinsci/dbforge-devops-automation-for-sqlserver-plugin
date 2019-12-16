@@ -57,11 +57,14 @@ public class BuildStepBuilder extends BaseStepBuilder {
       return false;
     }
 
+    if(!validateFilterFile(listener))
+      return false;
+
     FreeStyleProject freeStyleProject = (FreeStyleProject) build.getProject();
     if (freeStyleProject != null)
       return EnvironmentValidator.validate(freeStyleProject.getBuilders(), build.getWorkspace(), listener);
 
-    return false;
+    return true;
   }
 
   @Override
@@ -80,7 +83,7 @@ public class BuildStepBuilder extends BaseStepBuilder {
     PowerShellCommand command = new PowerShellCommand();
 
     command.addConnectionScript(connection);
-    command.addDatabaseBuildScript(project, connection.getConnectionName(), compareOptions);
+    command.addDatabaseBuildScript(project, connection.getConnectionName(), additionalOptions);
 
     return command;
   }
@@ -142,6 +145,16 @@ public class BuildStepBuilder extends BaseStepBuilder {
     }
 
     public FormValidation doCheckSubfolder(@QueryParameter String value) {
+      if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
+      return FormValidation.ok();
+    }
+
+    public FormValidation doCheckFilterFile(@QueryParameter String value) {
+      if (value.length() == 0)
+        return FormValidation.ok();
+      if (!value.endsWith(".scflt"))
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongScfltPath());
       if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
       return FormValidation.ok();

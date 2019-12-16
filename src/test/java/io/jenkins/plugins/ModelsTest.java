@@ -15,9 +15,10 @@ public class ModelsTest {
   @Rule
   public JenkinsRule jenkins = new JenkinsRule();
 
-  private final String packageId = "id", sourceControlFolder = "sourceControlFolder", compareOptions = "compareOptions",
+  private final String packageId = "id", sourceControlFolder = "sourceControlFolder",
     server = "srv", database = "db", userName = "su", password = "su",
-    test = "test1", testResults = "testResults", dgen = "dgen", transactionIsoLvl = "transactionIsoLvl";
+    test = "test1", testResults = "testResults", dgen = "dgen",
+    compareOptions = "compareOptions", filterFile  = "filter.scflt", transactionIsoLvl = "transactionIsoLvl";
 
   @Test
   public void testPackageProject() {
@@ -68,19 +69,19 @@ public class ModelsTest {
   @Test
   public void testRunTestInfo(){
 
-    RunTestInfo runTestInfo = new RunTestInfo(true, test, testResults,true, dgen, compareOptions);
+    RunTestInfo runTestInfo = new RunTestInfo(true, test, testResults,true, dgen);
     assertEquals(runTestInfo.getRunEveryTests(), true);
     assertEquals(runTestInfo.getRunTests(), test);
     assertEquals(runTestInfo.getGenerateTestData(), true);
     assertEquals(runTestInfo.getDgenFile(), dgen);
-    assertEquals(runTestInfo.getCompareOptions(), compareOptions);
   }
 
   @Test
-  public void testSyncDatabaseInfo(){
+  public void testAdditionalOptionsModel(){
 
-    SyncDatabaseInfo syncDatabaseInfo = new SyncDatabaseInfo(compareOptions, transactionIsoLvl);
-    assertEquals(syncDatabaseInfo.getCompareOptions(), compareOptions);
-    assertEquals(syncDatabaseInfo.getTransactionIsoLvl(), transactionIsoLvl);
+    AdditionalOptionsModel additionalOptionsModel = new AdditionalOptionsModel(compareOptions, filterFile, transactionIsoLvl);
+    assertEquals(additionalOptionsModel.getCompareOptions(), compareOptions);
+    assertEquals(additionalOptionsModel.getFilterFile(), filterFile);
+    assertEquals(additionalOptionsModel.getTransactionIsoLvl(), transactionIsoLvl);
   }
 }

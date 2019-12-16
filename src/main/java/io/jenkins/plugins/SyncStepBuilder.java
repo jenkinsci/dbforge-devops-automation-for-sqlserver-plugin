@@ -1,5 +1,6 @@
 package io.jenkins.plugins;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -11,13 +12,11 @@ import hudson.util.FormValidation;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-public class SyncStepBuilder extends BaseStepBuilder {
+import java.nio.file.Paths;
 
-  private String transactionIsoLvl = "Serializable";
-  private SyncDatabaseInfo syncDatabaseInfo;
+public class SyncStepBuilder extends BaseStepBuilder {
 
   @DataBoundConstructor
   public SyncStepBuilder(String packageId, String server, String database, String authenticationType, String userName, Secret password) {
@@ -26,15 +25,11 @@ public class SyncStepBuilder extends BaseStepBuilder {
     this.stepId = StepIds.Sync;
   }
 
-  public String getTransactionIsoLvl() {
+  @Override
+  @SuppressFBWarnings
+  public boolean prebuild(Build build, BuildListener listener){
 
-    return transactionIsoLvl;
-  }
-
-  @DataBoundSetter
-  public void setTransactionIsoLvl(String transactionIsoLvl) {
-
-    this.transactionIsoLvl = transactionIsoLvl;
+    return validateFilterFile(listener);
   }
 
   @Override
@@ -45,7 +40,6 @@ public class SyncStepBuilder extends BaseStepBuilder {
       return false;
     }
 
-    syncDatabaseInfo = new SyncDatabaseInfo(compareOptions, transactionIsoLvl);
     return super.preExecute(launcher, listener, workspace);
   }
 
@@ -56,7 +50,7 @@ public class SyncStepBuilder extends BaseStepBuilder {
     PowerShellCommand command = new PowerShellCommand();
 
     command.addConnectionScript(connection);
-    command.addSyncDatabaseScript(project.getSourceFolder(), connection.getConnectionName(), syncDatabaseInfo);
+    command.addSyncDatabaseScript(project.getSourceFolder(), connection.getConnectionName(), additionalOptions);
 
     return command;
   }
@@ -87,6 +81,16 @@ public class SyncStepBuilder extends BaseStepBuilder {
     public FormValidation doCheckUserName(@QueryParameter String value) {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingUserName());
+      return FormValidation.ok();
+    }
+
+    public FormValidation doCheckFilterFile(@QueryParameter String value) {
+      if (value.length() == 0)
+        return FormValidation.ok();
+      if (!value.endsWith(".scflt"))
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongScfltPath());
+      if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
+        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
       return FormValidation.ok();
     }
 

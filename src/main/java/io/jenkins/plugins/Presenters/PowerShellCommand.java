@@ -5,7 +5,7 @@ import hudson.util.Secret;
 import io.jenkins.plugins.Models.ConnectionInfo;
 import io.jenkins.plugins.Models.PackageProject;
 import io.jenkins.plugins.Models.RunTestInfo;
-import io.jenkins.plugins.Models.SyncDatabaseInfo;
+import io.jenkins.plugins.Models.AdditionalOptionsModel;
 
 public class PowerShellCommand {
 
@@ -26,21 +26,24 @@ public class PowerShellCommand {
     addScriptSeparator();
   }
 
-  public void addDatabaseBuildScript(PackageProject project, String connectionName, String compareOptions) {
+  public void addDatabaseBuildScript(PackageProject project, String connectionName, AdditionalOptionsModel additionalOptions) {
 
     sb.append(String.format("%n$%s = Invoke-DevartDatabaseBuild -SourceScriptsFolder \"%s\" -Connection $%s",
       project.getDatabaseProjectName(),
       project.getSourceFolder(),
       connectionName));
 
-    if (!compareOptions.isEmpty())
-      sb.append(String.format(" -SynchronizationOptions \"%s\"", compareOptions));
+    if (!additionalOptions.getFilterFile().isEmpty())
+      sb.append(String.format(" -FilterPath \"%s\"", additionalOptions.getFilterFile()));
+
+    if (!additionalOptions.getCompareOptions().isEmpty())
+      sb.append(String.format(" -SynchronizationOptions \"%s\"", additionalOptions.getCompareOptions()));
     addScriptSeparator();
 
     sb.append(String.format("%nif(-Not $%s.Valid) { [System.Environment]::Exit(1); }", project.getDatabaseProjectName()));
   }
 
-  public void addTestBuildScript(String scriptFolder, String connectionName, RunTestInfo testInfo) {
+  public void addTestBuildScript(String scriptFolder, String connectionName, RunTestInfo testInfo, AdditionalOptionsModel additionalOptions) {
 
     sb.append(String.format("%n$result = Invoke-DevartDatabaseTests -InputObject \"%s\" -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -RewriteReport",
       scriptFolder,
@@ -57,24 +60,30 @@ public class PowerShellCommand {
     if (!testInfo.getRunEveryTests())
       sb.append(String.format(" -UnitTests %s", "\"" + testInfo.getRunTests()+"\""));
 
-    if (!testInfo.getCompareOptions().isEmpty())
-      sb.append(String.format(" -SynchronizationOptions \"%s\"", testInfo.getCompareOptions()));
+    if (!additionalOptions.getFilterFile().isEmpty())
+      sb.append(String.format(" -FilterPath \"%s\"", additionalOptions.getFilterFile()));
+
+    if (!additionalOptions.getCompareOptions().isEmpty())
+      sb.append(String.format(" -SynchronizationOptions \"%s\"", additionalOptions.getCompareOptions()));
     addScriptSeparator();
 
     sb.append(String.format("%nif(-Not $result) { [System.Environment]::Exit(1); }"));
   }
 
-  public void addSyncDatabaseScript(String scriptFolder, String targetConnectionName, SyncDatabaseInfo syncDatabaseInfo) {
+  public void addSyncDatabaseScript(String scriptFolder, String targetConnectionName, AdditionalOptionsModel additionalOptionsModel) {
 
     sb.append(String.format("%n$result = Invoke-DevartSyncDatabaseSchema -Source \"%s\" -Target $%s",
       scriptFolder,
       targetConnectionName));
 
-    if (!syncDatabaseInfo.getTransactionIsoLvl().isEmpty())
-      sb.append(String.format(" -TransactionIsolationLevel %s", syncDatabaseInfo.getTransactionIsoLvl()));
+    if (!additionalOptionsModel.getTransactionIsoLvl().isEmpty())
+      sb.append(String.format(" -TransactionIsolationLevel %s", additionalOptionsModel.getTransactionIsoLvl()));
 
-    if (!syncDatabaseInfo.getCompareOptions().isEmpty())
-      sb.append(String.format(" -SynchronizationOptions \"%s\"", syncDatabaseInfo.getCompareOptions()));
+    if (!additionalOptionsModel.getCompareOptions().isEmpty())
+      sb.append(String.format(" -SynchronizationOptions \"%s\"", additionalOptionsModel.getCompareOptions()));
+
+    if (!additionalOptionsModel.getFilterFile().isEmpty())
+      sb.append(String.format(" -FilterPath \"%s\"", additionalOptionsModel.getFilterFile()));
     addScriptSeparator();
 
     sb.append(String.format("%nif(-Not $result) { [System.Environment]::Exit(1); }"));
