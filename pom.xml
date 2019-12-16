@@ -11,9 +11,9 @@
 
     <artifactId>dbforge-devops-automation-for-sqlserver</artifactId>
     <name>dbForge DevOps Automation for SQL Server</name>
-    <version>1.0.92-SNAPSHOT</version>
+    <version>1.0.92</version>
     <description>Devart dbForge DevOps Automation for SQL Server is designed for establishing the Continuous Integration process in Jenkins when developing SQL Server databases.</description>
-    <url>https://wiki.jenkins.io/x/FYRaCg</url>
+    <url>https://github.com/jenkinsci/dbforge-devops-automation-for-sqlserver-plugin</url>
 
     <packaging>hpi</packaging>
     <properties>

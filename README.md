@@ -19,19 +19,19 @@ Continuous Integration within a Jenkins project:
 
 ## Requirements
 
-#### dbForge Developer Bundle
+#### dbForge SQL Tools
 
 The dbForge DevOps Automation for SQL Server plugin requires
 installation of traditional dbForge tools for its work. All the tools
 required for establishing the DevOps process in Jenkins are included in
-[dbForge SQL Tools](https://www.devart.com/dbforge/sql/sql-tools/download.html){.external-link}.
+[dbForge SQL Tools](https://www.devart.com/dbforge/sql/sql-tools/download.html).
 ALL THE TOOLS THAT ARE USED BY dbForge DevOps Automation for SQL Server
 HAVE a trial period.
 
 #### Jenkins
 
 Jenkins [version
-2.150](https://jenkins.io/changelog#v2.150){.external-link} or newer is
+2.150](https://jenkins.io/changelog#v2.150) or newer is
 required.
 
 ## Help Us to Make it Better
@@ -41,4 +41,4 @@ SQL Server, submit a pull request with your code to us. Upon approval,
 we WILL IMPLEMENT the suggested changes.
 
 You can also email us at
-[support@devart.com](https://wiki.jenkins.io/display/JENKINS/mailto:support@devart.com){.external-link}
+[support@devart.com](https://wiki.jenkins.io/display/JENKINS/mailto:support@devart.com)
