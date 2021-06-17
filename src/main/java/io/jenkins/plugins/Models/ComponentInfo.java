@@ -4,24 +4,25 @@ import java.util.HashMap;
 
 public class ComponentInfo {
 
-    public static final String PowerShellModuleFullName    = "dbForge DevOps Automation PowerShell for SQL Server";
-    public static final String PowerShellModuleName        = "Devart.DbForge.DevOpsAutomation.SqlServer";
-    public static final String PowerShellModuleMinVersion  = "1.0.127";
+    public static final String PowerShellModuleFullName = "dbForge DevOps Automation PowerShell for SQL Server";
+    public static final String PowerShellModuleName = "Devart.DbForge.DevOpsAutomation.SqlServer";
+    public static final String PowerShellModuleMinVersion = "1.1.1";
 
-    public static final String DataGenRegId        = "DevartDataGeneratorMSSql_is1";
-    public static final String UnitTestRegId       = "DevartUnitTest_is1";
-    public static final String SchemaCompareRegId  = "DevartSchemaCompareMSSql_is1";
-    public static final String DocumenterRegId     = "DevartDocumenterMSSql_is1";
-    public static final String registryPath        = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"; //считаем что это общий часть пути для всех наших продуктов
+    public static final String StudioRegId = "DevartStudioMSSql_is1";
+    public static final String DataGenRegId = "DevartDataGeneratorMSSql_is1";
+    public static final String UnitTestRegId = "DevartUnitTest_is1";
+    public static final String SchemaCompareRegId = "DevartSchemaCompareMSSql_is1";
+    public static final String DocumenterRegId = "DevartDocumenterMSSql_is1";
+    public static final String registryPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\"; //считаем что это общий часть пути для всех наших продуктов
 
     private static HashMap<String, ComponentInfo> PossibleComponents = new HashMap<>();
 
-    static{
-
-        PossibleComponents.put(SchemaCompareRegId,  new ComponentInfo(SchemaCompareRegId, "5.0.57", "dbForge Schema Compare for SQL Server"));
-        PossibleComponents.put(UnitTestRegId,       new ComponentInfo(UnitTestRegId, "1.5.48", "dbForge Unit Test for SQL Server"));
-        PossibleComponents.put(DataGenRegId,        new ComponentInfo(DataGenRegId, "4.2.52", "dbForge Data Generator for SQL Server"));
-        PossibleComponents.put(DocumenterRegId,     new ComponentInfo(DocumenterRegId, "9.9.99", "dbForge Documenter for SQL Server"));
+    static {
+        PossibleComponents.put(StudioRegId, new ComponentInfo(StudioRegId, "6.0.327", "dbForge Studio for SQL Server"));
+        PossibleComponents.put(SchemaCompareRegId, new ComponentInfo(SchemaCompareRegId, "5.1.36", "dbForge Schema Compare for SQL Server"));
+        PossibleComponents.put(UnitTestRegId, new ComponentInfo(UnitTestRegId, "1.6.38", "dbForge Unit Test for SQL Server"));
+        PossibleComponents.put(DataGenRegId, new ComponentInfo(DataGenRegId, "4.3.37", "dbForge Data Generator for SQL Server"));
+        PossibleComponents.put(DocumenterRegId, new ComponentInfo(DocumenterRegId, "1.5.36", "dbForge Documenter for SQL Server"));
     }
 
     private String id;
@@ -30,12 +31,19 @@ public class ComponentInfo {
 
     private ComponentInfo(String _id, String _version, String _componentName) {
 
-        id = _id; version = _version; componentName = _componentName;
+        id = _id;
+        version = _version;
+        componentName = _componentName;
     }
 
-    public static ComponentInfo GetComponentInfo(String Id){
+    public static ComponentInfo GetComponentInfo(String Id) {
 
-          return PossibleComponents.get(Id);
+        return PossibleComponents.get(Id);
+    }
+
+    public static ComponentInfo GetStudioInfo() {
+
+        return PossibleComponents.get(StudioRegId);
     }
 
     public String[] GetPSCallingParams() {
@@ -57,5 +65,4 @@ public class ComponentInfo {
 
         return id;
     }
-
 }

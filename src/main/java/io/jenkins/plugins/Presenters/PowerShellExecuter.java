@@ -87,7 +87,8 @@ public class PowerShellExecuter {
       return generateCmdString(sqlCiLocation);
 
     StringBuilder longStringBuilder = new StringBuilder();
-    longStringBuilder.append("\"").append(PowerShellExecuter.getPowerShellExeLocation()).append("\" -NonInteractive -ExecutionPolicy Bypass -command \"& { . ").append(sqlCiLocation).append("; " + functionName);
+    String location = sqlCiLocation.replace("'", "''");
+    longStringBuilder.append("\"").append(PowerShellExecuter.getPowerShellExeLocation()).append("\" -NonInteractive -ExecutionPolicy Bypass -command \"& { . '").append(location).append("'; " + functionName);
     for(int i = 0; i < functionParams.length; i++)
     {
       longStringBuilder.append(" " + functionParams[i]);

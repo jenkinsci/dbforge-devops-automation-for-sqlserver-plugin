@@ -29,8 +29,7 @@ public class EnvironmentValidator {
 
         Map<String, ComponentInfo> checkComponents = new HashMap();
 
-        for (int i = 0; i < builders.size();i++ )
-        {
+        for (int i = 0; i < builders.size();i++ ) {
             if(builders.get(i) instanceof BaseStepBuilder) {
                 BaseStepBuilder builder = (BaseStepBuilder) builders.get(i);
                 StepIds si = builder.getStepId();
@@ -47,23 +46,30 @@ public class EnvironmentValidator {
 
         boolean result = true;
 
+        String psComponentFailedDescription = null;
         List<String> failedComponentName = new ArrayList<>();
 
         try {
             FilePath scriptLocation = copyResourceToWorkspace(workspace, Constants.psScriptsLocation);
             Launcher launcher = scriptLocation.createLauncher(listener);
 
-            if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall",
+            // check ps module installed
+            if (!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckPowerShellInstall",
                     new String[]{ComponentInfo.PowerShellModuleName, ComponentInfo.PowerShellModuleMinVersion})) {
                 result = false;
-                failedComponentName.add(String.format("%s, ver. %s", ComponentInfo.PowerShellModuleFullName, ComponentInfo.PowerShellModuleMinVersion));
+                psComponentFailedDescription = String.format("%s, ver. %s", ComponentInfo.PowerShellModuleFullName, ComponentInfo.PowerShellModuleMinVersion);
             }
 
-            for(Map.Entry<String, ComponentInfo> entry : checkComponents.entrySet()) {
-                if(!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall",
-                        entry.getValue().GetPSCallingParams())) {
-                    result = false;
-                    failedComponentName.add(String.format("%s, ver. %s", entry.getValue().GetComponentName(), entry.getValue().GetComponentVersion()));
+            // check dbForge Studio installed
+            if (!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall",
+                    ComponentInfo.GetStudioInfo().GetPSCallingParams())) {
+                // if stdio not installed, check mini tools
+                for (Map.Entry<String, ComponentInfo> entry : checkComponents.entrySet()) {
+                    if (!PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "CheckRequiredComponentInstall",
+                            entry.getValue().GetPSCallingParams())) {
+                        result = false;
+                        failedComponentName.add(String.format("%s, ver. %s", entry.getValue().GetComponentName(), entry.getValue().GetComponentVersion()));
+                    }
                 }
             }
         }
@@ -76,13 +82,23 @@ public class EnvironmentValidator {
             return false;
         }
 
-        if(failedComponentName.size() > 0) {
+        if (psComponentFailedDescription != null || failedComponentName.size() > 0) {
             listener.getLogger().println("The dbForge DevOps Automation for SQL Server Jenkins plugin requires the following components to be installed:");
-            for (int i = 0; i < failedComponentName.size(); i++) {
-                listener.getLogger().println("\t" + failedComponentName.get(i));
+            listener.getLogger().println();
+            if (psComponentFailedDescription != null)
+                listener.getLogger().println("\t" + psComponentFailedDescription);
+            if (failedComponentName.size() > 0) {
+                for (int i = 0; i < failedComponentName.size(); i++) {
+                    listener.getLogger().println("\t" + failedComponentName.get(i));
+                }
+                listener.getLogger().println("\tor");
+                listener.getLogger().println("\t" + String.format("%s Enterprise edition, ver. %s", ComponentInfo.GetStudioInfo().GetComponentName(), ComponentInfo.GetStudioInfo().GetComponentVersion()));
             }
-            listener.getLogger().println("You need to download these products at:\n" +
-                "https://www.devart.com/dbforge/sql/developer-bundle/download.html");
+            listener.getLogger().println();
+            listener.getLogger().println("You can download these products at:\n" +
+                    "https://www.devart.com/dbforge/sql/sql-tools/download.html\n" +
+                    "https://www.devart.com/dbforge/sql/studio/download.html");
+            listener.getLogger().println();
         }
         return result;
     }

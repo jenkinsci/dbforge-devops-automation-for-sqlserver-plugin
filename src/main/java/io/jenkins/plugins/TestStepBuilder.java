@@ -88,7 +88,7 @@ public class TestStepBuilder extends BaseStepBuilder {
   protected boolean preExecute(Launcher launcher, TaskListener listener, FilePath workspace) {
 
     if (ProjectRepository.getInstance().getPackageProject(packageId) == null) {
-      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
+      listener.error(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
       return false;
     }
     String outputReportFilename = new SimpleDateFormat("'dbforgeDevopsTestResults_'yyyyMMdd_HHmmss'.xml'").format(new Date());

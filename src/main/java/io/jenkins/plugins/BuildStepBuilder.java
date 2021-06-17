@@ -120,12 +120,6 @@ public class BuildStepBuilder extends BaseStepBuilder {
       return FormValidation.ok();
     }
 
-    public FormValidation doCheckSourceControlFolder(@QueryParameter String value) {
-      if (value.length() == 0)
-        return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingLocation());
-      return FormValidation.ok();
-    }
-
     public FormValidation doCheckServer(@QueryParameter String value) {
       if (value.length() == 0)
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_missingServer());
@@ -145,7 +139,7 @@ public class BuildStepBuilder extends BaseStepBuilder {
     }
 
     public FormValidation doCheckSubfolder(@QueryParameter String value) {
-      if (!Utils.isValidPath(value) || Paths.get(value).isAbsolute())
+      if (value.length() == 0 || !Utils.isValidPath(value) || Paths.get(value).isAbsolute())
         return FormValidation.error(io.jenkins.plugins.Messages.BuildStepBuilder_DescriptorImpl_errors_wrongRelativePath());
       return FormValidation.ok();
     }

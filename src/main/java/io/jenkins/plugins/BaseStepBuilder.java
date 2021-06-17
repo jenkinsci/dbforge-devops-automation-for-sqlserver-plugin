@@ -178,7 +178,7 @@ public abstract class BaseStepBuilder extends Builder {
 
   protected void postExecute(Launcher launcher, TaskListener listener, FilePath workspace, boolean buildSuccessful){
 
-    if (connection.getIsLocalDb()) {
+    if (connection != null && connection.getIsLocalDb()) {
       executeScript(launcher, listener, workspace, String.format("DROP DATABASE \"%s\";", connection.getDatabase()));
       FilePath scriptLocation = new FilePath(workspace, Constants.psScriptsLocation);
       PowerShellExecuter.getInstance().execute(launcher, listener, workspace, scriptLocation, "DeleteLocalDbInstance", new String[]{ConnectionInfo.localDbInstance});

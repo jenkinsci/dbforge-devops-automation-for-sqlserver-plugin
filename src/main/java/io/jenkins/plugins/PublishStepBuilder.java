@@ -56,7 +56,7 @@ public class PublishStepBuilder extends Builder {
     boolean buildResult;
     PackageProject project = ProjectRepository.getInstance().getPackageProject(packageId);
     if (project == null) {
-      listener.getLogger().println(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
+      listener.error(String.format(io.jenkins.plugins.Messages.packageMustBeBuilt(), packageId));
       buildResult = false;
     }
     else {

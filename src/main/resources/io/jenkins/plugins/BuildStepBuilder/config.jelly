@@ -20,7 +20,7 @@
     </f:radioBlock>
   </f:section>
   <f:section title="${%OutputPackageSection}">
-    <f:entry title="${%PackageId}" field="packageId" help="/plugin/dbforge-devops-automation-for-sqlserver/help-packageId.html">
+    <f:entry title="${%PackageId}" field="packageId" help="/plugin/dbforge-devops-automation-for-sqlserver/help-buildPackageId.html">
       <f:textbox />
     </f:entry>
   </f:section>
