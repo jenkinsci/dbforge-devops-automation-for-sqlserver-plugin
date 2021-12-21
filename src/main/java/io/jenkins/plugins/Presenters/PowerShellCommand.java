@@ -43,6 +43,27 @@ public class PowerShellCommand {
     sb.append(String.format("%nif(-Not $%s.Valid) { [System.Environment]::Exit(1); }", project.getDatabaseProjectName()));
   }
 
+  public void addDatabaseExecuteScript(String connectionName, String filesToExecute, String fileEncoding, Secret zipPassword, Boolean ignoreError) {
+
+    sb.append(String.format("%n$result = Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\"",
+            connectionName,
+            filesToExecute
+            ));
+
+    if (!fileEncoding.isEmpty())
+      sb.append(String.format(" -Encoding \"%s\"", fileEncoding));
+
+    if (!Secret.toString(zipPassword).isEmpty())
+      sb.append(String.format(" -ZipPassword \"%s\"", zipPassword));
+
+    if (ignoreError)
+      sb.append(" -IgnoreError");
+
+    addScriptSeparator();
+
+    sb.append(String.format("%nif(-Not $result) { [System.Environment]::Exit(1); }"));
+  }
+
   public void addTestBuildScript(String scriptFolder, String connectionName, RunTestInfo testInfo, AdditionalOptionsModel additionalOptions) {
 
     sb.append(String.format("%n$result = Invoke-DevartDatabaseTests -InputObject \"%s\" -TemporaryDatabaseServer $%s -OutReportFileName:\"%s\" -ReportFormat %s -RewriteReport",
@@ -103,10 +124,10 @@ public class PowerShellCommand {
     addScriptSeparator();
   }
 
-  public void addPublishDatabaseProject(String databaseProjectName, String packageVersion, String repository, String api) {
+  public void addPublishDatabaseProject(String databaseProjectName, String packageVersion, String repository, Secret api) {
 
     sb.append(String.format("%nPublish-DevartDatabaseProject -Project $%s -Repository %s", databaseProjectName, repository));
-    if (!api.isEmpty())
+    if (!Secret.toString(api).isEmpty())
       sb.append(String.format(" -ApiKey %s", api));
     if (packageVersion.isEmpty())
       sb.append(" -AutoIncrementVersion");

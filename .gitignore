@@ -1,4 +1,12 @@
-/.idea/
-/target/
-/work/
-*.iml
+# Java output files
+**/*.class
+**/*.ctxt
+**/*.jar
+**/*.zip
+**/*.iml
+
+# Java directories
+**/.idea
+**/data
+**/target
+**/work

@@ -1,12 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <f:section title="${%DatabasePackageSection}">
-    <f:entry title="${%PackageId}" field="packageId" help="/plugin/dbforge-devops-automation-for-sqlserver/help-syncPackageId.html">
-      <f:textbox />
-    </f:entry>
-  </f:section>
   <f:section title="${%TargetDatabaseSection}">
-    <f:block>${%TargetDatabaseSectionDescr}</f:block>
     <f:entry title="${%Server}" field="server">
       <f:textbox />
     </f:entry>
@@ -35,22 +29,21 @@
       </f:radioBlock>
     </f:entry>
   </f:section>
+  <f:section title="${%FilesToExecuteSection}">
+    <f:entry title="${%Path}" field="filesToExecute" help="/plugin/dbforge-devops-automation-for-sqlserver/help-filesToExecute.html">
+      <f:textbox />
+    </f:entry>
+  </f:section>
   <f:advanced>
     <f:section title="${%AdvancedSection}">
-      <f:entry title="${%CompareOptions}" field="compareOptions" help="/plugin/dbforge-devops-automation-for-sqlserver/help-compareOptions.html">
-        <f:textbox />
+      <f:entry title="${%Encoding}" field="fileEncoding" help="/plugin/dbforge-devops-automation-for-sqlserver/help-fileEncoding.html">
+        <f:select />
       </f:entry>
-      <f:entry title="${%FilterFile}" field="filterFile" help="/plugin/dbforge-devops-automation-for-sqlserver/help-compareFilter.html">
-        <f:textbox />
+      <f:entry title="${%ZipPassword}" field="zipPassword" help="/plugin/dbforge-devops-automation-for-sqlserver/help-zipPassword.html">
+        <f:password />
       </f:entry>
-      <f:entry title="${%TransactionIsoLvl}" field="transactionIsoLvl" help="/plugin/dbforge-devops-automation-for-sqlserver/help-transactionIsoLvl.html">
-        <select name="transactionIsoLvl">
-          <option value="Serializable" selected="${instance.transactionIsoLvl.equals('Serializable')? 'true':null}">Serializable</option>
-          <option value="Snapshot" selected="${instance.transactionIsoLvl.equals('Snapshot')? 'true':null}">Snapshot</option>
-          <option value="RepeatableRead" selected="${instance.transactionIsoLvl.equals('RepeatableRead')? 'true':null}">Repeatable Read</option>
-          <option value="ReadCommitted" selected="${instance.transactionIsoLvl.equals('ReadCommitted')? 'true':null}">Read Committed</option>
-          <option value="ReadUncommitted" selected="${instance.transactionIsoLvl.equals('ReadUncommitted')? 'true':null}">Read Uncommitted</option>
-        </select>
+      <f:entry help="/plugin/dbforge-devops-automation-for-sqlserver/help-ignoreError.html">
+        <f:checkbox title="${%IgnoreError}" name="ignoreError"/>
       </f:entry>
     </f:section>
   </f:advanced>

@@ -25,7 +25,8 @@ public class PowerShellCommandTest {
   private final String packageId = "id", packageVersion = "1.0.1", nugetRepository = "repository", nugetApi = "api",
     connectionName = "connectionName", server = "srv", database = "db", userName = "su", password = "su",
     test = "test1", testResults = "testResults", dgen = "dgen", sourceControlFolder = "sourceControlFolder",
-    compareOptions = "compareOptions", filterFile = "filter.scflt", transactionIsoLvl = "Serializable";
+    compareOptions = "compareOptions", filterFile = "filter.scflt", transactionIsoLvl = "Serializable",
+    filesToExecute = "filesToExecute", fileEncoding = "fileEncoding", zipPassword = "zipPassword";
 
   @Test
   public void testAddConnectionScript() {
@@ -298,7 +299,7 @@ public class PowerShellCommandTest {
     PackageProject project = new PackageProject(packageId);
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s
-    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, Secret.fromString(""));
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -306,7 +307,7 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), not(containsString("-AutoIncrementVersion")));
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s -AutoIncrementVersion true
-    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, Secret.fromString(""));
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -314,7 +315,7 @@ public class PowerShellCommandTest {
     assertThat(command.toString(), containsString("-AutoIncrementVersion"));
 
     // Publish-DevartDatabaseProject -Project %s -Repository %s -ApiKey %s -AutoIncrementVersion true
-    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, nugetApi);
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), "", nugetRepository, Secret.fromString(nugetApi));
     assertThat(command.toString(), containsString("Publish-DevartDatabaseProject"));
     assertThat(command.toString(), containsString(String.format("-Project $%s", project.getDatabaseProjectName())));
     assertThat(command.toString(), containsString(String.format("-Repository %s", nugetRepository)));
@@ -350,7 +351,7 @@ public class PowerShellCommandTest {
     command.addTestBuildScript(sourceControlFolder, connectionName, runTestInfo, additionalOptionsModel);
     command.addSyncDatabaseScript(sourceControlFolder, connectionName, additionalOptionsModel);
     command.addPackageInfo(project.getDatabaseProjectName(), project.getId(), "");
-    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, "");
+    command.addPublishDatabaseProject(project.getDatabaseProjectName(), packageVersion, nugetRepository, Secret.fromString(""));
 
     String[] scripts = command.toString().split(command.separator);
     assertTrue(scripts.length > 7);
@@ -363,5 +364,90 @@ public class PowerShellCommandTest {
     assertEquals(command.toString().isEmpty(), false);
     assertThat(command.toString(), startsWith("try"));
     assertThat(command.toString(), containsString("catch"));
+  }
+
+  @Test
+  public void testAddDatabaseExecuteScript() {
+
+    PowerShellCommand command = new PowerShellCommand();
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\"
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, "", null, false);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), not(containsString("-Encoding")));
+    assertThat(command.toString(), not(containsString("-ZipPassword")));
+    assertThat(command.toString(), not(containsString("-IgnoreError")));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -Encoding \"%s\"
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, fileEncoding, Secret.fromString(""), false);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), containsString(String.format("-Encoding \"%s\"", fileEncoding)));
+    assertThat(command.toString(), not(containsString("-ZipPassword")));
+    assertThat(command.toString(), not(containsString("-IgnoreError")));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -ZipPassword \"%s\"
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, "", Secret.fromString(zipPassword), false);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), not(containsString("-Encoding")));
+    assertThat(command.toString(), containsString(String.format("-ZipPassword \"%s\"", zipPassword)));
+    assertThat(command.toString(), not(containsString("-IgnoreError")));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -IgnoreError
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, "", Secret.fromString(""), true);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), not(containsString("-Encoding")));
+    assertThat(command.toString(), not(containsString("-ZipPassword")));
+    assertThat(command.toString(), containsString("-IgnoreError"));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -Encoding \"%s\" -IgnoreError
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, fileEncoding, Secret.fromString(""), true);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), containsString(String.format("-Encoding \"%s\"", fileEncoding)));
+    assertThat(command.toString(), not(containsString("-ZipPassword")));
+    assertThat(command.toString(), containsString("-IgnoreError"));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -ZipPassword \"%s\" -IgnoreError
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, "", Secret.fromString(zipPassword), true);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), not(containsString("-Encoding")));
+    assertThat(command.toString(), containsString(String.format("-ZipPassword \"%s\"", zipPassword)));
+    assertThat(command.toString(), containsString("-IgnoreError"));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -Encoding \"%s\" -ZipPassword \"%s\"
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, fileEncoding, Secret.fromString(zipPassword), false);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), containsString("-Encoding"));
+    assertThat(command.toString(), containsString(String.format("-ZipPassword \"%s\"", zipPassword)));
+    assertThat(command.toString(), not(containsString("-IgnoreError")));
+
+    // Invoke-DevartExecuteScript  -Connection $%s -Input \"%s\" -Encoding \"%s\" -ZipPassword \"%s\" -IgnoreError
+    command = new PowerShellCommand();
+    command.addDatabaseExecuteScript(connectionName, filesToExecute, fileEncoding, Secret.fromString(zipPassword), true);
+    assertThat(command.toString(), containsString("Invoke-DevartExecuteScript"));
+    assertThat(command.toString(), containsString(String.format("-Connection $%s", connectionName)));
+    assertThat(command.toString(), containsString(String.format("-Input \"%s\"", filesToExecute)));
+    assertThat(command.toString(), containsString(String.format("-Encoding \"%s\"", fileEncoding)));
+    assertThat(command.toString(), containsString(String.format("-ZipPassword \"%s\"", zipPassword)));
+    assertThat(command.toString(), containsString("-IgnoreError"));
   }
 }

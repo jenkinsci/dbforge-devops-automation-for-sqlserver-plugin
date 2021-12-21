@@ -18,9 +18,10 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TestStepBuilder extends BaseStepBuilder {
+public class TestStepBuilder extends BaseExecuteStepBuilder {
 
   private final String runTestMode, runTests;
+  private final String packageId;
   private boolean generateTestData;
   private String dgenFile;
   private RunTestInfo testInfo;
@@ -29,10 +30,16 @@ public class TestStepBuilder extends BaseStepBuilder {
   public TestStepBuilder(String packageId, String serverType, String server, String database, String authenticationType,
                          String userName, Secret password, String runTestMode, String runTests) {
 
-    super(packageId, serverType, server, authenticationType, userName, password, database);
+    super(serverType, server, authenticationType, userName, password, database);
+    this.packageId = packageId;
     this.runTestMode = runTestMode;
     this.runTests = runTests;
     this.stepId = StepIds.Test;
+  }
+
+  public String getPackageId() {
+
+    return packageId;
   }
 
   public String getRunTestMode() {
@@ -70,6 +77,11 @@ public class TestStepBuilder extends BaseStepBuilder {
   public String runTestModeEquals(String runTestMode) {
 
     return this.runTestMode.equalsIgnoreCase(runTestMode) ? "true" : "false";
+  }
+
+  @Override
+  protected void OnStarted(BuildListener listener) {
+    listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 
   @Override

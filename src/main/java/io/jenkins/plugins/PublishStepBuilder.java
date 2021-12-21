@@ -7,6 +7,7 @@ import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import io.jenkins.plugins.Models.*;
 import io.jenkins.plugins.Presenters.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -15,10 +16,11 @@ import org.springframework.util.StringUtils;
 
 public class PublishStepBuilder extends Builder {
 
-  private final String packageId, nugetFeedUrl, nugetFeedUrlApi, packageVersion;
+  private final String packageId, nugetFeedUrl, packageVersion;
+  private final Secret nugetFeedUrlApi;
 
   @DataBoundConstructor
-  public PublishStepBuilder(String packageId, String nugetFeedUrl, String nugetFeedUrlApi, String packageVersion) {
+  public PublishStepBuilder(String packageId, String nugetFeedUrl, Secret nugetFeedUrlApi, String packageVersion) {
 
     this.packageId = packageId;
     this.nugetFeedUrl = nugetFeedUrl;
@@ -36,7 +38,7 @@ public class PublishStepBuilder extends Builder {
     return nugetFeedUrl;
   }
 
-  public String getNugetFeedUrlApi() {
+  public Secret getNugetFeedUrlApi() {
 
     return nugetFeedUrlApi;
   }

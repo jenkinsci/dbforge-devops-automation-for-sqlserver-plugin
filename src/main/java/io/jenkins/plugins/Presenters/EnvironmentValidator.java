@@ -4,7 +4,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.BuildListener;
 import hudson.tasks.Builder;
-import io.jenkins.plugins.BaseStepBuilder;
+import io.jenkins.plugins.BaseExecuteStepBuilder;
 import io.jenkins.plugins.Models.ComponentInfo;
 import io.jenkins.plugins.Models.Constants;
 import io.jenkins.plugins.Models.StepIds;
@@ -30,8 +30,8 @@ public class EnvironmentValidator {
         Map<String, ComponentInfo> checkComponents = new HashMap();
 
         for (int i = 0; i < builders.size();i++ ) {
-            if(builders.get(i) instanceof BaseStepBuilder) {
-                BaseStepBuilder builder = (BaseStepBuilder) builders.get(i);
+            if(builders.get(i) instanceof BaseExecuteStepBuilder) {
+                BaseExecuteStepBuilder builder = (BaseExecuteStepBuilder) builders.get(i);
                 StepIds si = builder.getStepId();
 
                 if (stepComponentParams.keySet().contains(si)) {
@@ -119,6 +119,10 @@ public class EnvironmentValidator {
         if(!listComponents.contains(componentInfo))
             listComponents.add(componentInfo);
         stepComponentParams.put(StepIds.Test, listComponents);
+
+        listComponents = new ArrayList();
+        listComponents.add(ComponentInfo.GetComponentInfo(ComponentInfo.SchemaCompareRegId));
+        stepComponentParams.put(StepIds.Execute, listComponents);
 
         //условно добавляемые компоненты
         for (int i = 0; i < builders.size();i++ ) {

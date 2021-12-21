@@ -4,9 +4,9 @@ import hudson.FilePath;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 public final class Utils {
@@ -26,10 +26,16 @@ public final class Utils {
     public static FilePath generateScriptFile(TaskListener listener, FilePath workspace, String script, String extension) {
 
         try {
-            FilePath filePath = workspace.createTempFile("PowerShell\\dbforge_devops_script_", extension);
-            try (PrintWriter out = new PrintWriter(new File(filePath.getRemote()), "UTF-8")) {
-                out.println(script);
+            FilePath filePath = workspace.createTempFile("dbforge_devops_script_", extension);
+
+            InputStream stream = new ByteArrayInputStream(script.getBytes(StandardCharsets.UTF_8));
+            try {
+                filePath.copyFrom(stream);
+            } finally {
+                if (stream != null)
+                    stream.close();
             }
+
             return filePath;
         } catch (IOException e) {
             listener.error("Unexpected I/O exception executing script: " + e.getMessage());

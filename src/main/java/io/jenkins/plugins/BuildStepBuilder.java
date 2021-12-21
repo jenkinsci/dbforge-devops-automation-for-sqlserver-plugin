@@ -18,19 +18,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import hudson.model.TaskListener;
 
-public class BuildStepBuilder extends BaseStepBuilder {
+public class BuildStepBuilder extends BaseExecuteStepBuilder {
 
   private final String sourceFolderMode, subfolder;
   private PackageProject project;
+
+  protected final String packageId;
 
   @DataBoundConstructor
   public BuildStepBuilder(String sourceFolderMode, String subfolder, String packageId,
                           String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
-    super(packageId, serverType, server, authenticationType, userName, password, database);
+    super(serverType, server, authenticationType, userName, password, database);
+    this.packageId = packageId;
     this.sourceFolderMode = sourceFolderMode;
     this.subfolder = subfolder;
     this.stepId = StepIds.Buid;
+  }
+
+  public String getPackageId() {
+
+    return packageId;
   }
 
   public String getSourceFolderMode() {
@@ -65,6 +73,11 @@ public class BuildStepBuilder extends BaseStepBuilder {
       return EnvironmentValidator.validate(freeStyleProject.getBuilders(), build.getWorkspace(), listener);
 
     return true;
+  }
+
+  @Override
+  protected void OnStarted(BuildListener listener) {
+    listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 
   @Override

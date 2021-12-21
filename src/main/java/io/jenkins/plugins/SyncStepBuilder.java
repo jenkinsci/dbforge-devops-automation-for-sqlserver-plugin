@@ -16,13 +16,21 @@ import org.kohsuke.stapler.QueryParameter;
 
 import java.nio.file.Paths;
 
-public class SyncStepBuilder extends BaseStepBuilder {
+public class SyncStepBuilder extends BaseExecuteStepBuilder {
+
+  protected final String packageId;
 
   @DataBoundConstructor
   public SyncStepBuilder(String packageId, String server, String database, String authenticationType, String userName, Secret password) {
 
-    super(packageId, "server", server, authenticationType, userName, password, database);
+    super(Constants.server, server, authenticationType, userName, password, database);
+    this.packageId = packageId;
     this.stepId = StepIds.Sync;
+  }
+
+  public String getPackageId() {
+
+    return packageId;
   }
 
   @Override
@@ -30,6 +38,11 @@ public class SyncStepBuilder extends BaseStepBuilder {
   public boolean prebuild(Build build, BuildListener listener){
 
     return validateFilterFile(listener);
+  }
+
+  @Override
+  protected void OnStarted(BuildListener listener) {
+    listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 
   @Override
