@@ -15,16 +15,19 @@ public abstract class BaseExecuteStepBuilder extends Builder {
 
   private final String serverType, authenticationType, server, database, userName;
   private final Secret password;
-  protected StepIds stepId;
+  private StepIds stepId;
   protected ConnectionInfo connection;
 
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
   protected AdditionalOptionsModel additionalOptions;
+
   private String filterFile;
   private String compareOptions;
   private String transactionIsoLvl = "Serializable";
 
-  public BaseExecuteStepBuilder(String serverType, String server, String authenticationType, String userName, Secret password, String database) {
+  public BaseExecuteStepBuilder(StepIds stepId, String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
+    this.stepId = stepId;
     this.serverType = serverType;
     this.server = server;
     this.database = database;
@@ -115,7 +118,7 @@ public abstract class BaseExecuteStepBuilder extends Builder {
   public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
 
     listener.getLogger().println(String.format("Started '%s'", getDescriptor().getDisplayName()));
-    OnStarted(listener);
+    onStarted(listener);
 
     FilePath workspace = build.getWorkspace();
     boolean result = preExecute(launcher, listener, workspace) && PowerShellExecuter.getInstance().execute(launcher, listener, workspace, getPowerShellCommand(workspace));
@@ -127,7 +130,7 @@ public abstract class BaseExecuteStepBuilder extends Builder {
     return result;
   }
 
-  protected void OnStarted(BuildListener listener) {
+  protected void onStarted(BuildListener listener) {
   }
 
   protected boolean preExecute(Launcher launcher, TaskListener listener, FilePath workspace) {

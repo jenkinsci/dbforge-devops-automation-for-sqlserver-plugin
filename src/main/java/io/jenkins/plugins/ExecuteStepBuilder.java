@@ -28,9 +28,8 @@ public class ExecuteStepBuilder extends BaseExecuteStepBuilder {
     @DataBoundConstructor
     public ExecuteStepBuilder(String server, String authenticationType, String userName, Secret password, String database, String filesToExecute) {
 
-        super(Constants.server, server, authenticationType, userName, password, database);
+        super(StepIds.Execute, Constants.server, server, authenticationType, userName, password, database);
         this.filesToExecute = filesToExecute;
-        this.stepId = StepIds.Execute;
     }
 
     public String getFilesToExecute() {

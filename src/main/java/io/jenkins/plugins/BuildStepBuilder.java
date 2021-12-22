@@ -29,11 +29,10 @@ public class BuildStepBuilder extends BaseExecuteStepBuilder {
   public BuildStepBuilder(String sourceFolderMode, String subfolder, String packageId,
                           String serverType, String server, String authenticationType, String userName, Secret password, String database) {
 
-    super(serverType, server, authenticationType, userName, password, database);
+    super(StepIds.Buid, serverType, server, authenticationType, userName, password, database);
     this.packageId = packageId;
     this.sourceFolderMode = sourceFolderMode;
     this.subfolder = subfolder;
-    this.stepId = StepIds.Buid;
   }
 
   public String getPackageId() {
@@ -76,7 +75,7 @@ public class BuildStepBuilder extends BaseExecuteStepBuilder {
   }
 
   @Override
-  protected void OnStarted(BuildListener listener) {
+  protected void onStarted(BuildListener listener) {
     listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 

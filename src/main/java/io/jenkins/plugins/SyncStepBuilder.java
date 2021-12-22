@@ -23,9 +23,8 @@ public class SyncStepBuilder extends BaseExecuteStepBuilder {
   @DataBoundConstructor
   public SyncStepBuilder(String packageId, String server, String database, String authenticationType, String userName, Secret password) {
 
-    super(Constants.server, server, authenticationType, userName, password, database);
+    super(StepIds.Sync, Constants.server, server, authenticationType, userName, password, database);
     this.packageId = packageId;
-    this.stepId = StepIds.Sync;
   }
 
   public String getPackageId() {
@@ -41,7 +40,7 @@ public class SyncStepBuilder extends BaseExecuteStepBuilder {
   }
 
   @Override
-  protected void OnStarted(BuildListener listener) {
+  protected void onStarted(BuildListener listener) {
     listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 

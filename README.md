@@ -11,6 +11,7 @@ Continuous Integration within a Jenkins project:
 
 -   **Build** - deploys a database on LocalDB or on a specified SQL
     Server and generate NuGet package from a Source control repository.
+-   **Execute** - executes the SQL scripts.
 -   **Test** - runs tSQLt and generates test data.
 -   **Sync** - deploys a NuGet package and synchronizes it with a
     working DB.

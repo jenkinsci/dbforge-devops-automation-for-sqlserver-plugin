@@ -30,11 +30,10 @@ public class TestStepBuilder extends BaseExecuteStepBuilder {
   public TestStepBuilder(String packageId, String serverType, String server, String database, String authenticationType,
                          String userName, Secret password, String runTestMode, String runTests) {
 
-    super(serverType, server, authenticationType, userName, password, database);
+    super(StepIds.Test, serverType, server, authenticationType, userName, password, database);
     this.packageId = packageId;
     this.runTestMode = runTestMode;
     this.runTests = runTests;
-    this.stepId = StepIds.Test;
   }
 
   public String getPackageId() {
@@ -80,7 +79,7 @@ public class TestStepBuilder extends BaseExecuteStepBuilder {
   }
 
   @Override
-  protected void OnStarted(BuildListener listener) {
+  protected void onStarted(BuildListener listener) {
     listener.getLogger().println(String.format("Package ID: '%s'", packageId));
   }
 
